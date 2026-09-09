@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Payment Complete | Alcatraz Outlaws Training')
+@section('title', 'Payment Complete | ACES Lacrosse Training')
 
 @section('content')
 @include('pages.customer_sessions._styles')
@@ -92,9 +92,9 @@
     }
 
     .payment-success-summary {
-        border: 1px solid rgba(0, 0, 0, .08);
+        border: 1px solid rgba(97, 30, 178, .10);
         border-radius: 20px;
-        background: #fafafa;
+        background: #faf9fc;
         padding: 22px;
     }
 
@@ -102,21 +102,21 @@
         margin-top: 3px;
         font-size: 20px;
         font-weight: 900;
-        color: #101828;
+        color: #171021;
         word-break: break-word;
     }
 
     .payment-success-total {
         margin-top: 3px;
-        color: #f3282c;
+        color: #611eb2;
         font-size: 30px;
         line-height: 1;
         font-weight: 900;
     }
 
     .payment-success-items {
-        border-top: 1px solid rgba(0, 0, 0, .07);
-        border-bottom: 1px solid rgba(0, 0, 0, .07);
+        border-top: 1px solid rgba(97, 30, 178, .10);
+        border-bottom: 1px solid rgba(97, 30, 178, .10);
         padding: 10px 0;
     }
 
@@ -135,7 +135,7 @@
     }
 
     .payment-success-transaction i {
-        color: #f3282c;
+        color: #611eb2;
     }
 </style>
 @endsection
