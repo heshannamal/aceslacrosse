@@ -1,10 +1,11 @@
 @extends('layouts.app')
+@section('title', 'Reset Training Password | ACES Lacrosse')
 @section('content')
 @include('pages.customer_sessions._styles')
 <div class="ao-training"><div class="ao-wrap" style="max-width:650px">
     <div class="ao-panel" style="padding:36px">
         <div class="ao-eyebrow">ACCOUNT RECOVERY</div><h1 class="ao-section-title mt-2">Reset your Training password</h1>
-        <p class="ao-muted mt-2 mb-4">Enter the email used for your Alcatraz Outlaws Training account. If it matches an active account, we’ll email you a secure reset link.</p>
+        <p class="ao-muted mt-2 mb-4">Enter the email used for your ACES Lacrosse Training account. If it matches an active account, we’ll email you a secure reset link.</p>
         @if(session('success'))<div class="ao-alert ao-alert-success">{{ session('success') }}</div>@endif
         @if(session('error'))<div class="ao-alert ao-alert-error">{{ session('error') }}</div>@endif
         @if($errors->any())<div class="ao-alert ao-alert-error">{{ $errors->first() }}</div>@endif
