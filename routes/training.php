@@ -1,40 +1,38 @@
 <?php
 
-use App\Http\Controllers\CustomerModuleSwitchController;
 use App\Http\Controllers\EMCustomerController;
 use App\Http\Controllers\TrainingAuthController;
 use App\Http\Controllers\TrainingDashboardController;
 use App\Http\Controllers\TrainingPortalController;
 use App\Http\Controllers\TrainingProfileController;
 use App\Http\Controllers\TrainingRegistrationController;
-use App\Http\Middleware\EnsureTrainingCustomerContext;
 use App\Http\Middleware\EnsureTrainingCustomerPricing;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('training')->name('em.customer.')->group(function () {
-    Route::post('/switch-from-shop', [CustomerModuleSwitchController::class, 'toTraining'])
-        ->name('switch.from.shop');
+    Route::get('/login', [TrainingAuthController::class, 'login'])->name('login');
+    Route::post('/login', [TrainingAuthController::class, 'loginSubmit'])->name('login.submit');
+    Route::get('/create-password', [TrainingAuthController::class, 'createPassword'])->name('password.create');
+    Route::post('/create-password', [TrainingAuthController::class, 'storePassword'])->middleware('throttle:10,1')->name('password.store');
 
-    Route::middleware(EnsureTrainingCustomerContext::class)->group(function () {
-        Route::get('/login', [TrainingAuthController::class, 'login'])->name('login');
-        Route::post('/login', [TrainingAuthController::class, 'loginSubmit'])->name('login.submit');
-        Route::get('/create-password', [TrainingAuthController::class, 'createPassword'])->name('password.create');
-        Route::post('/create-password', [TrainingAuthController::class, 'storePassword'])->middleware('throttle:10,1')->name('password.store');
-        Route::get('/register', function (\Illuminate\Http\Request $request) {
-            if (session()->has('em_customer_id')) {
-                return redirect()->route('em.customer.dashboard');
-            }
-            if ($request->filled('redirect')) {
-                session()->put('em_url_intended', $request->string('redirect')->toString());
-            }
-            return view('pages.customer_sessions.register');
-        })->name('register');
-        Route::post('/register', [TrainingRegistrationController::class, 'store'])->name('register.submit');
-        Route::get('/forgot-password', [EMCustomerController::class, 'forgotPassword'])->name('password.request');
-        Route::post('/forgot-password', [EMCustomerController::class, 'forgotPasswordSubmit'])->middleware('throttle:5,1')->name('password.email');
-        Route::get('/reset-password/{token}', [EMCustomerController::class, 'resetPassword'])->middleware('throttle:20,1')->name('password.reset');
-        Route::post('/reset-password', [EMCustomerController::class, 'resetPasswordSubmit'])->middleware('throttle:5,1')->name('password.update');
-    });
+    Route::get('/register', function (Request $request) {
+        if (session()->has('em_customer_id')) {
+            return redirect()->route('em.customer.dashboard');
+        }
+
+        if ($request->filled('redirect')) {
+            session()->put('em_url_intended', $request->string('redirect')->toString());
+        }
+
+        return view('pages.customer_sessions.register');
+    })->name('register');
+    Route::post('/register', [TrainingRegistrationController::class, 'store'])->name('register.submit');
+
+    Route::get('/forgot-password', [EMCustomerController::class, 'forgotPassword'])->name('password.request');
+    Route::post('/forgot-password', [EMCustomerController::class, 'forgotPasswordSubmit'])->middleware('throttle:5,1')->name('password.email');
+    Route::get('/reset-password/{token}', [EMCustomerController::class, 'resetPassword'])->middleware('throttle:20,1')->name('password.reset');
+    Route::post('/reset-password', [EMCustomerController::class, 'resetPasswordSubmit'])->middleware('throttle:5,1')->name('password.update');
 
     Route::get('/', [TrainingPortalController::class, 'index'])->name('index');
     Route::get('/calendar-events', [TrainingPortalController::class, 'calendarEvents'])->name('calendar.events');
@@ -64,9 +62,6 @@ Route::prefix('training')->name('em.customer.')->group(function () {
         Route::delete('/profile/players/{child}', [TrainingProfileController::class, 'deleteChild'])->name('profile.children.delete');
     });
 });
-
-Route::post('/training-switch', [CustomerModuleSwitchController::class, 'toTraining'])
-    ->name('customer.module.switch.training');
 
 Route::prefix('book_my_sessions')->group(function () {
     Route::get('/', fn () => redirect()->route('em.customer.index'));
