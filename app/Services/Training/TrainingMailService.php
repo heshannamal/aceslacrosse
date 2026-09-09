@@ -31,13 +31,13 @@ class TrainingMailService
 
     public function passwordReset(EMCustomer $customer, string $url): void
     {
-        $this->send($customer->email, 'Reset your Alcatraz Outlaws Training password', 'emails.training.password-reset', compact('customer', 'url'));
+        $this->send($customer->email, 'Reset your ACES Lacrosse Training password', 'emails.training.password-reset', compact('customer', 'url'));
     }
 
     public function receipt(EMCustomer $customer, EMPackageOrder $order): void
     {
         $order->loadMissing(['items.package', 'paymentLogs']);
-        $this->send($customer->email, 'Alcatraz Outlaws Training receipt ' . $order->order_no, 'emails.training.receipt', compact('customer', 'order'));
+        $this->send($customer->email, 'ACES Lacrosse Training receipt ' . $order->order_no, 'emails.training.receipt', compact('customer', 'order'));
     }
 
     public function bookingCreated(EMSessionBooking $booking): void
@@ -46,7 +46,7 @@ class TrainingMailService
         if (!$booking->customer) {
             return;
         }
-        $this->send($booking->customer->email, 'Training booking confirmed - Alcatraz Outlaws', 'emails.training.booking-confirmed', compact('booking'));
+        $this->send($booking->customer->email, 'Training booking confirmed - ACES Lacrosse', 'emails.training.booking-confirmed', compact('booking'));
     }
 
     public function bookingUpdated(EMSessionBooking $booking, ?EMSessionEvent $oldSession, EMSessionEvent $newSession): void
@@ -55,7 +55,7 @@ class TrainingMailService
         if (!$booking->customer) {
             return;
         }
-        $this->send($booking->customer->email, 'Your Alcatraz Outlaws session was updated', 'emails.training.booking-updated', compact('booking', 'oldSession', 'newSession'));
+        $this->send($booking->customer->email, 'Your ACES Lacrosse session was updated', 'emails.training.booking-updated', compact('booking', 'oldSession', 'newSession'));
     }
 
     public function bookingCancelled(EMSessionBooking $booking, ?EMSessionEvent $session, bool $creditReturned): void
@@ -64,7 +64,7 @@ class TrainingMailService
         if (!$booking->customer) {
             return;
         }
-        $this->send($booking->customer->email, 'Your Alcatraz Outlaws booking was cancelled', 'emails.training.booking-cancelled', compact('booking', 'session', 'creditReturned'));
+        $this->send($booking->customer->email, 'Your ACES Lacrosse booking was cancelled', 'emails.training.booking-cancelled', compact('booking', 'session', 'creditReturned'));
     }
 
     public function reminder(EMSessionBooking $booking): void
@@ -73,6 +73,6 @@ class TrainingMailService
         if (!$booking->customer || !$booking->sessionEvent) {
             return;
         }
-        $this->send($booking->customer->email, 'Training reminder - ' . ($booking->sessionEvent->training_type ?: $booking->sessionEvent->name), 'emails.training.session-reminder', compact('booking'));
+        $this->send($booking->customer->email, 'ACES Training reminder - ' . ($booking->sessionEvent->training_type ?: $booking->sessionEvent->name), 'emails.training.session-reminder', compact('booking'));
     }
 }
