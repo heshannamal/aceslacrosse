@@ -61,9 +61,9 @@ class TrainingAuthController extends Controller
         }
 
         /*
-         * Match the Baddies first-time login behavior. Customers imported or
-         * created by Admin may already exist without a password. Send those
-         * customers to a dedicated password creation screen before login.
+         * Customers imported or created by ACES Admin may already exist
+         * without a password. Send those customers to a dedicated password
+         * creation screen before login.
          */
         if (empty($customer->password)) {
             $request->session()->put(self::PASSWORD_SETUP_CUSTOMER_KEY, $customer->id);
@@ -87,7 +87,7 @@ class TrainingAuthController extends Controller
         $this->completeLogin($request, $customer);
 
         return $this->redirectAfterLogin($request)
-            ->with('success', 'Welcome back to Alcatraz Outlaws Training.');
+            ->with('success', 'Welcome back to ACES Lacrosse Training.');
     }
 
     public function createPassword(Request $request)
