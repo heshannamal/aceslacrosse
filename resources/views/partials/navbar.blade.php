@@ -638,10 +638,6 @@
                 </a>
 
                 <div class="header-actions">
-                    <button type="button" class="header-action-btn search-icon" data-header-search aria-label="Search">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                    </button>
-
                     <a href="{{ $trainingCartUrl }}" class="header-action-btn" aria-label="Training cart">
                         <i class="fa-solid fa-cart-shopping"></i>
                         @if($trainingLoggedIn && $trainingCartCount > 0)
@@ -719,7 +715,7 @@
                         <a href="{{ URL('/pages/aces-grow-your-game-davis') }}" class="nav-item dropdown {{ request()->is('pages/aces-grow-your-game-davis') ? 'active' : '' }}">Grow Your Game - Davis</a>
                     </div>
                 </li>
-                <li><a href="{{ route('em.customer.index') }}" class="nav-item {{ request()->is('training*') ? 'active' : '' }}">TRAINING</a></li>
+                <li><a href="{{ route('em.customer.index') }}" class="nav-item {{ request()->is('training*') ? 'active' : '' }}">Training</a></li>
                 <li><a href="{{ URL('/pages/contact-us') }}" class="nav-item {{ request()->is('pages/contact-us') ? 'active' : '' }}">Contact Us</a></li>
             </ul>
         </div>
@@ -733,10 +729,6 @@
                 </a>
 
                 <div class="header-actions mobile-header-actions">
-                    <button type="button" class="header-action-btn search-icon" data-header-search aria-label="Search">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                    </button>
-
                     <a href="{{ $trainingCartUrl }}" class="header-action-btn" aria-label="Training cart">
                         <i class="fa-solid fa-cart-shopping"></i>
                         @if($trainingLoggedIn && $trainingCartCount > 0)
@@ -815,7 +807,7 @@
                 <a href="{{ URL('/pages/aces-grow-your-game-davis') }}" class="mobile {{ request()->is('pages/aces-grow-your-game-davis') ? 'active' : '' }}">Grow Your Game - Davis</a>
             </div>
         </li>
-        <li><a href="{{ route('em.customer.index') }}" class="mobile {{ request()->is('training*') ? 'active' : '' }}">TRAINING</a></li>
+        <li><a href="{{ route('em.customer.index') }}" class="mobile {{ request()->is('training*') ? 'active' : '' }}">Training</a></li>
         <li><a href="{{ URL('/pages/contact-us') }}" class="mobile {{ request()->is('pages/contact-us') ? 'active' : '' }}">Contact Us</a></li>
     </ul>
 </div>
