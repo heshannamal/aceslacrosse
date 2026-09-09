@@ -53,4 +53,8 @@ return [
         'url' => env('AUTHORIZE_NET_URL'),
     ],
 
+    'training' => [
+        'mail_bcc' => env('TRAINING_MAIL_BCC'),
+    ],
+
 ];
