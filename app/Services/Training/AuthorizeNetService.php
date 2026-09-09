@@ -30,7 +30,7 @@ class AuthorizeNetService
                     'name' => $loginId,
                     'transactionKey' => $transactionKey,
                 ],
-                'refId' => 'ao-' . substr(hash('sha256', $invoiceNumber . microtime(true)), 0, 18),
+                'refId' => 'aces-' . substr(hash('sha256', $invoiceNumber . microtime(true)), 0, 16),
                 'transactionRequest' => [
                     'transactionType' => 'authCaptureTransaction',
                     'amount' => number_format($amount, 2, '.', ''),
@@ -43,7 +43,7 @@ class AuthorizeNetService
                     ],
                     'order' => [
                         'invoiceNumber' => substr($invoiceNumber, 0, 20),
-                        'description' => 'Alcatraz Outlaws Training',
+                        'description' => 'ACES Lacrosse Training',
                     ],
                     'customer' => [
                         'email' => (string) ($billing['email'] ?? ''),
@@ -51,7 +51,7 @@ class AuthorizeNetService
                     'billTo' => [
                         'firstName' => (string) ($billing['first_name'] ?? ''),
                         'lastName' => (string) ($billing['last_name'] ?? ''),
-                        'company' => 'Alcatraz Outlaws',
+                        'company' => 'ACES Lacrosse',
                         'address' => (string) ($billing['street'] ?? ''),
                         'city' => (string) ($billing['city'] ?? ''),
                         'state' => (string) ($billing['state'] ?? ''),
