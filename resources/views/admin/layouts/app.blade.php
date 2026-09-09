@@ -3,12 +3,13 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', 'Admin') | Alcatraz Outlaws</title>
+    <title>@yield('title', 'Admin') | ACES Lacrosse</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
-    <link href="{{ asset('admin_assets/css/admin.css') }}" rel="stylesheet">
-    <link href="{{ asset('admin_assets/css/admin-profile.css') }}" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="{{ asset('public/admin_assets/css/admin.css') }}" rel="stylesheet">
+    <link href="{{ asset('public/admin_assets/css/admin-profile.css') }}" rel="stylesheet">
     @stack('styles')
 </head>
 <body>
@@ -33,7 +34,7 @@
 <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="{{ asset('admin_assets/js/admin.js') }}"></script>
+<script src="{{ asset('public/admin_assets/js/admin.js') }}"></script>
 @stack('scripts')
 </body>
 </html>
