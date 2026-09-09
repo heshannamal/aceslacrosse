@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $package->package_name . ' | Training')
+@section('title', $package->package_name . ' | ACES Training')
 
 @section('content')
 @include('pages.customer_sessions._styles')
@@ -19,14 +19,14 @@
         <a href="{{ route('em.customer.packages') }}" class="ao-chip-link mb-4"><i class="fa-solid fa-arrow-left"></i> Packages</a>
         <div class="ao-grid-2 align-items-center">
             <div>
-                <div class="ao-eyebrow">ALCATRAZ TRAINING PACKAGE</div>
+                <div class="ao-eyebrow">ACES TRAINING PACKAGE</div>
                 <h1 class="ao-title" style="font-size:52px">{{ $package->package_name }}</h1>
-                <p class="ao-muted" style="font-size:17px">{{ $package->package_description ?: 'Use these class credits to book available Alcatraz Outlaws training sessions.' }}</p>
+                <p class="ao-muted" style="font-size:17px">{{ $package->package_description ?: 'Use these class credits to book available ACES Lacrosse training sessions.' }}</p>
                 <div class="d-flex gap-2 flex-wrap mt-4"><span class="ao-tag"><i class="fa-solid fa-ticket"></i> {{ $package->available_classes }} {{ \Illuminate\Support\Str::plural('Class', $package->available_classes) }}</span><span class="ao-tag"><i class="fa-solid fa-repeat"></i> Credits stay on your account until used</span></div>
             </div>
-            <div class="ao-panel p-4" style="background:#fffafa;border-color:#ffd2d4">
+            <div class="ao-panel p-4" style="background:#faf7ff;border-color:#dcc8f2">
                 <small class="ao-muted">{{ strtoupper($priceLabel) }}</small>
-                <div style="font-size:48px;font-weight:900;color:#f3282c">${{ number_format($displayPrice, 2) }}</div>
+                <div style="font-size:48px;font-weight:900;color:#611eb2">${{ number_format($displayPrice, 2) }}</div>
                 @if($package->available_classes > 0)<div class="ao-muted mb-4">${{ number_format($displayPrice / $package->available_classes, 2) }} per class</div>@endif
                 <form method="POST" action="{{ route('em.customer.cart.add', $package->id) }}">
                     @csrf
