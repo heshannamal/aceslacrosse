@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Training Packages')
+@section('title', 'Training Packages | ACES Lacrosse')
 
 @section('content')
 @include('pages.customer_sessions._styles')
@@ -17,7 +17,7 @@
 
     <div class="d-flex align-items-end justify-content-between gap-3 flex-wrap mb-4">
         <div>
-            <div class="ao-eyebrow">TRAINING CREDITS</div>
+            <div class="ao-eyebrow">ACES TRAINING CREDITS</div>
             <h1 class="ao-section-title">Choose a Package</h1>
             <p class="ao-muted mb-0">Browse and add packages without signing in. Authentication is required when you continue to checkout.</p>
         </div>
@@ -35,9 +35,9 @@
                     <span class="ao-price-tier">{{ $priceLabel }}</span>
                 </div>
                 <h2 class="mt-3 mb-1" style="font-weight:900">{{ $package->package_name }}</h2>
-                <p class="ao-muted flex-grow-1">{{ $package->package_description ?: 'Alcatraz Outlaws training class credits.' }}</p>
+                <p class="ao-muted flex-grow-1">{{ $package->package_description ?: 'ACES Lacrosse training class credits.' }}</p>
                 <div class="d-flex align-items-end justify-content-between gap-3 mb-3">
-                    <div><small class="ao-muted">{{ $priceLabel }}</small><div style="font-size:36px;font-weight:900;color:#f3282c">${{ number_format($displayPrice, 2) }}</div></div>
+                    <div><small class="ao-muted">{{ $priceLabel }}</small><div style="font-size:36px;font-weight:900;color:#611eb2">${{ number_format($displayPrice, 2) }}</div></div>
                     @if($package->available_classes > 0)<small class="ao-muted">${{ number_format($displayPrice / $package->available_classes, 2) }}/class</small>@endif
                 </div>
                 <div class="d-grid gap-2">
