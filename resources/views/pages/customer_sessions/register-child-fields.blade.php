@@ -1,5 +1,5 @@
 <div class="training-register-column child-column">
-    <div class="training-form-section-title">Child Details</div>
+    <div class="training-form-section-title">Player Details</div>
 
     <div class="training-field-grid">
         <div class="training-field">
@@ -116,18 +116,18 @@
     }
 
     .training-position-option:hover {
-        border-color: #f3282c;
+        border-color: #611eb2;
     }
 
     .training-position-option:has(input:checked) {
-        border-color: #f3282c;
-        background: #fff1f1;
-        color: #f3282c !important;
+        border-color: #611eb2;
+        background: #f4edfc;
+        color: #611eb2 !important;
     }
 
     .training-position-option input {
         margin: 0;
-        accent-color: #f3282c;
+        accent-color: #611eb2;
     }
 </style>
 
