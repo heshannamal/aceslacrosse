@@ -34,45 +34,23 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+
     'instagram' => [
-        'name' => env(
-            'INSTAGRAM_NAME',
-            'Aces Lacrosse'
-        ),
+        'name' => env('INSTAGRAM_NAME', 'Aces Lacrosse'),
+        'username' => env('INSTAGRAM_USERNAME', 'aceslacrosse_'),
+        'user_id' => env('INSTAGRAM_USER_ID', 'me'),
+        'access_token' => env('INSTAGRAM_ACCESS_TOKEN'),
+        'base_url' => env('INSTAGRAM_GRAPH_BASE_URL', 'https://graph.instagram.com'),
+        'version' => env('INSTAGRAM_GRAPH_VERSION', 'v22.0'),
+        'post_limit' => env('INSTAGRAM_POST_LIMIT', 8),
+        'cache_minutes' => env('INSTAGRAM_CACHE_MINUTES', 30),
+    ],
 
-        'username' => env(
-            'INSTAGRAM_USERNAME',
-            'aceslacrosse_'
-        ),
-
-        'user_id' => env(
-            'INSTAGRAM_USER_ID',
-            'me'
-        ),
-
-        'access_token' => env(
-            'INSTAGRAM_ACCESS_TOKEN'
-        ),
-
-        'base_url' => env(
-            'INSTAGRAM_GRAPH_BASE_URL',
-            'https://graph.instagram.com'
-        ),
-
-        'version' => env(
-            'INSTAGRAM_GRAPH_VERSION',
-            'v22.0'
-        ),
-
-        'post_limit' => env(
-            'INSTAGRAM_POST_LIMIT',
-            8
-        ),
-
-        'cache_minutes' => env(
-            'INSTAGRAM_CACHE_MINUTES',
-            30
-        ),
+    'authorize_net' => [
+        'login_id' => env('AUTHORIZE_NET_LOGIN_ID'),
+        'transaction_key' => env('AUTHORIZE_NET_TRANSACTION_KEY'),
+        'environment' => env('AUTHORIZE_NET_ENVIRONMENT', 'sandbox'),
+        'url' => env('AUTHORIZE_NET_URL'),
     ],
 
 ];
