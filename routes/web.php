@@ -73,6 +73,8 @@ Route::get(
     [InstagramFeedController::class, 'index']
 )->name('api.instagram-feed');
 
-
 Route::post('/contact/submit', [ContactController::class, 'submit'])
     ->name('contact.submit');
+
+require __DIR__.'/training.php';
+require __DIR__.'/admin.php';
