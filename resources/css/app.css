@@ -1,0 +1,42 @@
+/* Header base */
+.site-header { background: #fff; }
+
+/* TOP ROW */
+.header-top { padding-top: 10px; padding-bottom: 8px; }
+.aces-logo { height: 56px; width: auto; display: block; }
+
+/* Icon styling */
+.icon-btn { color: #111; text-decoration: none; }
+.icon-btn:hover { color: #6c2bd9; }
+
+/* BOTTOM ROW - nav */
+.main-nav { display:flex; flex-wrap:wrap; justify-content:center; gap: 28px; }
+.main-nav .nav-link {
+  color: #333 !important;
+  font-weight: 500;
+  font-size: 15px;
+  padding: 8px 4px;
+  letter-spacing: 0.4px;
+}
+.main-nav .nav-link:hover { color: #6c2bd9 !important; }
+
+/* Dropdown caret alignment */
+.navbar .dropdown-toggle::after {
+  margin-left: 6px;
+}
+
+/* Adjust spacing so nav sits below logo cleanly */
+.header-top + nav { margin-top: 6px; }
+
+/* Responsive tweaks */
+@media (max-width: 991px) {
+  .aces-logo { height: 48px; }
+  .main-nav { gap: 14px; }
+  .navbar-toggler { border: none; }
+}
+
+/* On very small screens show menu items stacked nicely */
+@media (max-width: 575px) {
+  .main-nav { flex-direction: column; align-items: center; }
+  .header-top { padding-top: 8px; padding-bottom: 8px; }
+}
