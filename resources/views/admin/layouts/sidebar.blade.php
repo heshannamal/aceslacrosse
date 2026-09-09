@@ -6,8 +6,8 @@
 @endphp
 <aside class="sidebar" id="sidebar">
     <div class="admin-brand">
-        <img src="{{ asset('images/logo.png') }}" alt="Alcatraz Outlaws" class="admin-brand-logo">
-        <div class="admin-brand-text"><strong>ALCATRAZ<br>OUTLAWS</strong><span>— ADMIN —</span></div>
+        <img src="{{ asset('public/assets/images/ACES-logo.webp') }}" alt="ACES Lacrosse" class="admin-brand-logo">
+        <div class="admin-brand-text"><strong>ACES LACROSSE</strong><span>— ADMIN —</span></div>
     </div>
     <nav class="sidebar-nav">
         <a href="{{ route('admin.dashboard') }}" class="sidebar-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"><i class="fa-solid fa-house"></i><span>Dashboard</span></a>
