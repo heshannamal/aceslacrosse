@@ -2,7 +2,7 @@
 @section('title', $package ? 'Edit Package' : 'Create Package')
 @section('content')
 <style>
-.form-card{background:#fff;border:1px solid #e2e8f0;border-radius:18px;overflow:hidden}.form-head{padding:20px 24px;background:linear-gradient(90deg,#fff,#fff7f7);border-bottom:1px solid #edf0f4;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}.form-body{padding:24px}.form-title{font-size:23px;font-weight:900;margin:0}.form-label{font-weight:800}.form-control:focus{border-color:#f3282c;box-shadow:0 0 0 .2rem rgba(243,40,44,.1)}.info-box{background:#fff7f7;border:1px solid #f6cbcc;border-radius:14px;padding:14px;color:#64748b}.price-card{height:100%;padding:18px;border:1px solid #e5e7eb;border-radius:16px;background:#fbfcfe}.price-card.guest{background:#fff7f7;border-color:#f7d1d2}.price-title{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:#475569;margin-bottom:8px}.price-help{font-size:12px;color:#64748b;margin-top:7px;line-height:1.45}
+.form-card{background:#fff;border:1px solid #e2e8f0;border-radius:18px;overflow:hidden}.form-head{padding:20px 24px;background:linear-gradient(90deg,#fff,#faf7ff);border-bottom:1px solid #edf0f4;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}.form-body{padding:24px}.form-title{font-size:23px;font-weight:900;margin:0}.form-label{font-weight:800}.form-control:focus{border-color:#611eb2;box-shadow:0 0 0 .2rem rgba(97,30,178,.1)}.info-box{background:#faf7ff;border:1px solid #e3d4f2;border-radius:14px;padding:14px;color:#64748b}.price-card{height:100%;padding:18px;border:1px solid #e5e7eb;border-radius:16px;background:#fbfcfe}.price-card.guest{background:#faf7ff;border-color:#e3d4f2}.price-title{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:#475569;margin-bottom:8px}.price-help{font-size:12px;color:#64748b;margin-top:7px;line-height:1.45}
 </style>
 
 <form class="form-card" method="POST" action="{{ $package ? route('admin.em.packages.update', $package) : route('admin.em.packages.store') }}">
@@ -10,7 +10,7 @@
     @if($package) @method('PUT') @endif
 
     <div class="form-head">
-        <div><h2 class="form-title">{{ $package ? 'Edit Package' : 'Create Package' }}</h2><div class="text-muted small mt-1">Set separate member/user and guest pricing for Training accounts.</div></div>
+        <div><h2 class="form-title">{{ $package ? 'Edit Package' : 'Create Package' }}</h2><div class="text-muted small mt-1">Set separate ACES Training member/user and guest pricing.</div></div>
         <a class="btn btn-outline-dark rounded-pill" href="{{ route('admin.em.packages.index') }}">Back</a>
     </div>
 
@@ -35,7 +35,7 @@
                 <div class="price-card guest">
                     <div class="price-title"><i class="fa-solid fa-user-plus me-1"></i> Guest Price *</div>
                     <div class="input-group"><span class="input-group-text">$</span><input type="number" step="0.01" min="0" class="form-control" name="guest_price" value="{{ old('guest_price', optional($package)->guest_price ?? optional($package)->getRawOriginal('package_price')) }}" required></div>
-                    <div class="price-help">Used for visitors and customers who create their own Training account online.</div>
+                    <div class="price-help">Used for visitors and customers who create their own ACES Training account online.</div>
                 </div>
             </div>
 
