@@ -99,7 +99,7 @@
                                 $session->street_address ?? null,
                                 $session->city ?? null,
                             ])->map(fn ($value) => trim((string) $value))->filter()->unique()->implode(', ');
-                            $instructors = collect(explode(',', (string) ($session->instructor ?? ''))
+                            $instructors = collect(explode(',', (string) ($session->instructor ?? '')))
                                 ->map(fn ($value) => trim($value))->filter()->values();
                             $isFull = (bool) ($session->is_full ?? false);
                             $spotsLeft = isset($session->spots_left) ? max(0, (int) $session->spots_left) : null;
