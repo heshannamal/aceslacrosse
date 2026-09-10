@@ -28,6 +28,10 @@
                 @include('admin.bookings._interaction_fix')
                 @include('admin.bookings._manual_booking_override')
             @endif
+
+            @if(request()->routeIs('admin.payments.index'))
+                @include('admin.payments._display_overrides')
+            @endif
         </main>
     </div>
 </div>
