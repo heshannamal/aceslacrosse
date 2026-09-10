@@ -4,809 +4,509 @@
 
 @section('content')
 <style>
-/* ---- Hero Section ---- */
-
-img.banner-image {
-    width: 100%;
-    height: auto;
-}
-.hero-section {
-    position: relative;
-    height: auto;
-    overflow: hidden;
-}
-
-.hero-section img {
-    width: 100%;
-    height: auto;
-    object-fit: cover;
-    display: block;
-}
-
-.hero-section .overlay {
-    position: absolute;
-    inset: 0;
-
-}
-
-.evaluation-section {
-    max-width: 80rem;
-    margin: 50px auto;
-}
-
-/* ---- AcademyContent ---- */
-.academy-section {
-    max-width: 80rem;
-    margin: 50px auto;
-    padding: 0 20px;
-}
-
-.academy-section h2 {
-    text-align: center;
-    font-size: 35px;
-    color: #611eb2;
-    margin-top: 25px;
-    margin-bottom: 15px;
-    text-transform: uppercase;
-    font-weight: 900;
-}
-
-.academy-section p {
-    font-size: 16px;
-    line-height: 1.7;
-    color: #0e0e0eff;
-    text-align: justify;
-    margin-bottom: 15px;
-    font-weight: 400;
-}
-/* ---- Tournaments Section (exact look) ---- */
-.tournaments-section {
-    max-width: 1250px;
-    margin: 100px auto;
-    padding: 0 20px;
-
-}
-
-.tournaments-section h2 {
-    text-align: center;
-    font-size: 42px;
-    font-weight: 900;
-    color: #611eb2;
-    text-transform: uppercase;
-    margin-bottom: 60px;
-}
-
-/* Card layout */
-.tournament-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-    gap: 40px;
-}
-
-/* Individual card */
-.tournament-card {
-    position: relative;
-    background: #fff;
-    border-radius: 20px;
-    padding: 28px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-/* ===== GRADIENT BORDER (TOP ONLY) ===== */
-.tournament-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 6px;
-  width: 100%;
-  background: linear-gradient(to right, #4c1d95, #7c3aed);
-  border-top-left-radius: 20px;
-  border-top-right-radius: 20px;
-}
-
-.tournament-card::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 6px;
-    background: var(--border-gradient);
-
-}
-/* ===== LEFT BORDER (color changes by class) ===== */
-.tournament-card::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 6px;
-  height: 100%;
-  background: var(--left-color);
-  border-bottom-left-radius: 20px;
-  border-top-left-radius: 20px;
-
-}
-
-
-/* ===== GLOW DOT ===== */
-.corner-dot {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: var(--dot-color);
-  box-shadow: 0 0 10px var(--dot-color);
-}
-
-/* Hover effect */
-.tournament-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 14px 35px rgba(0, 0, 0, 0.15);
-}
-
-/* Card Title */
-.tournament-card h3 {
-    font-size: 17px;
-    font-weight: 800;
-    color: #3e007b;
-    margin-bottom: 20px;
-}
-
-/* Date & location fields */
-.tournament-info {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 15px;
-    color: #444;
-    margin-bottom: 10px;
-}
-
-/* Rounded date badge */
-.date-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: #f3f1ff;
-    color: #611eb2;
-    padding: 6px 14px;
-    border-radius: 20px;
-    border: 1px solid #c0c0c0ff;
-    font-weight: 600;
-    font-size: 14px;
-}
-
-/* Gradient button */
-.tournament-btn {
-    display: block;
-    text-align: center;
-    width: 100%;
-    background: linear-gradient(to right, #4c1d95, #7c3aed);
-    color: #fff;
-    border-radius: 30px;
-    padding: 10px 0;
-    margin-top: 18px;
-    font-weight: 700;
-    font-size: 14px;
-    text-transform: uppercase;
-    text-decoration: none;
-    box-shadow: 0 3px 10px rgba(155, 52, 239, 0.4);
-}
-/* ===== COLOR THEMES ===== */
-.tournament-card.pink {
-  --left-color: #ff3e9d;
-  --dot-color: #ff3e9d;
-}
-.tournament-card.blue {
-  --left-color: #1dbcd4ff;
-  --dot-color: #1dbcd4ff;
-}
-.tournament-card.green {
-  --left-color: #4ade80;
-  --dot-color: #4ade80;
-}
-
-.tournament-card.orange {
-  --left-color: #f59e0b;
-  --dot-color: #f59e0b;
-}
-
-.tournament-card.violet {
-  --left-color: #9333ea;
-  --dot-color: #9333ea;
-}
-/* --- On hover: fade in + pulse --- */
-.tournament-card:hover .corner-dot {
-  opacity: 1;
-  transform: scale(1);
-  animation: pulse 1s ease-in-out infinite;
-}
-
-/* --- Pulse animation --- */
-@keyframes pulse {
-  0% { box-shadow: 0 0 0 2px rgba(0,0,0,0.25); }
-  50% { box-shadow: 0 0 0 5px rgba(0,0,0,0.25); }
-  100% { box-shadow: 0 0 0 8px rgba(177, 176, 176, 0.51); }
-}
-/* ===== TEAM SECTION ===== */
-.team-section {
-  max-width: 1250px;
-  margin: 120px auto;
-  padding: 0 20px;
-}
-
-.team-container {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 60px;
-  flex-wrap: wrap;
-}
-
-/* Left content */
-.team-content {
-  flex: 1 1 500px;
-}
-
-.team-content h2 {
-  font-size: 42px;
-  font-weight: 900;
-  color: #611eb2;
-  text-transform: uppercase;
-  margin-bottom: 35px;
-}
-
-/* List styling */
-.team-content ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.team-content li {
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  font-size: 18px;
-  color: #555555ff;
-  margin-bottom: 20px;
-  line-height: 1.5;
-  font-weight: 700;
-}
-
-/* Circle check icon */
-.check-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: #4d4d4eff;
-  color: #fff;
-  font-size: 14px;
-  font-weight: 700;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  box-shadow: 0 2px 6px rgba(97, 30, 178, 0.3);
-}
-
-/* Right image */
-.team-image {
-  flex: 1 1 540px;
-}
-
-.team-image img {
-  width: 100%;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
-}
-
-/* Responsive */
-@media (max-width: 900px) {
-  .team-container {
-    flex-direction: column;
-  }
-  .team-content h2 {
-    text-align: center;
-  }
-}
-
-/* ===== OFFENSE SECTION ===== */
-.offense-section {
-  max-width: 1250px;
-  margin: 120px auto;
-  padding: 0 20px;
-}
-
-.offense-container {
-  display: flex;
-  flex-direction: column;
-  gap: 50px;
-}
-
-/* Left text column */
-.offense-content {
-  flex: 1;
-}
-
-.offense-content h2 {
-  font-size: 42px;
-  font-weight: 900;
-  color: #611eb2;
-  text-transform: uppercase;
-  margin-bottom: 35px;
-}
-
-.offense-content ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.offense-content li {
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  font-size: 18px;
-  color: #333;
-  margin-bottom: 18px;
-  line-height: 1.6;
-}
-
-
-/* Right image column */
-.offense-images {
-  display: flex;
-  flex-direction: column;
-  gap: 40px;
-}
-
-.offense-img img {
-  width: 100%;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
-}
-
-/* Responsive layout */
-@media (min-width: 900px) {
-  .offense-container {
-    flex-direction: row;
-    align-items: flex-start;
-  }
-  .offense-content {
-    flex: 1 1 45%;
-  }
-  .offense-images {
-    flex: 1 1 55%;
-  }
-
-}
-/* ===== GOALIES & FACE OFF SECTIONS ===== */
-.goalies-section,
-.faceoff-section {
-  max-width: 1250px;
-  margin: 120px auto;
-  padding: 0 20px;
-}
-
-.goalies-container h2,
-.faceoff-container h2 {
-  font-size: 38px;
-  font-weight: 900;
-  color: #611eb2;
-  text-transform: uppercase;
-  margin-bottom: 25px;
-}
-
-.goalies-container p,
-.faceoff-container p {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  font-size: 18px;
-  line-height: 1.6;
-  color: #333;
-  margin: 0;
-}
-
-
-/* Responsive: Center headers on smaller screens */
-@media (max-width: 768px) {
-  .offense-content h2,
-  .goalies-container h2,
-  .faceoff-container h2 {
-    text-align: center;
-  }
-
-  /* Also center the text block and icon list for a better look */
-  .offense-content ul,
-  .goalies-container p,
-  .faceoff-container p {
-    text-align: left;
-    margin: 0 auto;
-    max-width: 90%;
-  }
-
-  /* Center images under the text */
-  .offense-images {
-    justify-content: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .offense-img img {
-    width: 100%;
-    max-width: 400px;
-  }
-
-  .hero-section {
-      height: auto;
-  }
-
-  .team-image {
-    flex: 0 0 132px;
-  }
-
-  .team-content {
-    flex: 1 1 370px;
-  }
-
-
-}
-
-@media screen and (min-width: 2560px) {
-  .container, .container-lg, .container-md, .container-sm, .container-xl, .container-xxl {
-    max-width: 230rem;
-  }
-  .academy-section {
-    max-width: 230rem;
-  }
-  .academy-section h2 {
-    font-size: 10rem;
-  }
-  .academy-section p {
-    font-size: 5rem;
-  }
-
-  .tournaments-section h2 {
-    font-size: 8rem;
-  }
-
-  .tournaments-section {
-    max-width: 230rem;
-  }
-
-  .tournament-card h3 {
-    font-size: 6rem;
-  }
-
-  .corner-dot {
-    width: 4rem;
-    height: 5rem;
-  }
-
-  .date-badge {
-    font-size: 4rem;
-  }
-
-  .tournament-btn {
-    font-size: 4rem;
-  }
-  .team-section {
-    max-width: 230rem;
-  }
-  .team-content h2 {
-    font-size: 8rem;
-  }
-
-  .team-content li {
-    font-size: 4rem;
-  }
-
-  .offense-section {
-    max-width: 230rem;
-  }
-  .offense-content h2 {
-    font-size: 8rem;
-  }
-
-  .offense-content li {
-     font-size: 4rem;
-  }
-
-  .goalies-section, .faceoff-section {
-    max-width: 230rem;
-  }
-
-  .goalies-container h2, .faceoff-container h2 {
-    font-size: 6rem;
-  }
-
-  .goalies-container p, .faceoff-container p {
-    font-size: 4rem;
-  }
-
- .evaluation-section {
-    max-width: 230rem;
-  }
-  .evaluation-section h1 {
-    font-size: 10rem !important;
-  }
-  .evaluation-section p {
-    font-size: 5rem !important;
-  }
-  .assessment-box h2 {
-    font-size: 6rem;
-  }
-
-  .evaluation-content {
-    max-width: none;
-  }
-
-}
-
-
+    .academy-page {
+        --aces-purple: #611eb2;
+        --aces-purple-dark: #431178;
+        --aces-purple-light: #f6f1fc;
+        --aces-text: #171717;
+        --aces-muted: #64646d;
+        --aces-border: #e8e0f1;
+        --aces-white: #ffffff;
+        background: #fff;
+    }
+
+    .academy-page .hero-section {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .academy-page .hero-section img {
+        display: block;
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+    }
+
+    .academy-page .academy-intro {
+        width: min(calc(100% - 40px), 1280px);
+        margin: 0 auto;
+        padding: 48px 0 24px;
+    }
+
+    .academy-page .academy-title {
+        margin: 0 0 28px;
+        color: var(--aces-purple);
+        font-size: clamp(32px, 4vw, 48px);
+        font-weight: 900;
+        line-height: 1.1;
+        text-align: center;
+        text-transform: uppercase;
+        letter-spacing: -0.02em;
+    }
+
+    .academy-page .academy-copy {
+        max-width: 1120px;
+        margin: 0 auto;
+    }
+
+    .academy-page .academy-copy p {
+        margin: 0 0 18px;
+        color: var(--aces-text);
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 1.8;
+        text-align: left;
+    }
+
+    .academy-page .academy-copy p:last-child {
+        margin-bottom: 0;
+    }
+
+    .academy-page .registration-section {
+        width: min(calc(100% - 40px), 1280px);
+        margin: 34px auto 90px;
+    }
+
+    .academy-page .registration-card {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid var(--aces-border);
+        border-radius: 28px;
+        background: linear-gradient(145deg, #ffffff 0%, #fbf9fe 100%);
+        box-shadow: 0 18px 50px rgba(67, 17, 120, 0.10);
+    }
+
+    .academy-page .registration-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 7px;
+        background: linear-gradient(90deg, #431178 0%, #611eb2 50%, #8c52d8 100%);
+    }
+
+    .academy-page .registration-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 28px;
+        padding: 38px 40px 28px;
+        border-bottom: 1px solid var(--aces-border);
+    }
+
+    .academy-page .registration-heading-wrap {
+        max-width: 720px;
+    }
+
+    .academy-page .registration-kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+        color: var(--aces-purple);
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+    }
+
+    .academy-page .registration-heading {
+        margin: 0 0 8px;
+        color: var(--aces-purple-dark);
+        font-size: clamp(27px, 3vw, 38px);
+        font-weight: 900;
+        line-height: 1.15;
+    }
+
+    .academy-page .registration-subtitle {
+        margin: 0;
+        color: var(--aces-muted);
+        font-size: 16px;
+        line-height: 1.6;
+    }
+
+    .academy-page .register-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        min-width: 210px;
+        padding: 15px 25px;
+        border: 2px solid var(--aces-purple);
+        border-radius: 999px;
+        background: linear-gradient(135deg, #4a148c 0%, #701fc2 100%);
+        color: #fff;
+        font-size: 15px;
+        font-weight: 800;
+        text-decoration: none;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        box-shadow: 0 10px 24px rgba(97, 30, 178, 0.24);
+        transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+    }
+
+    .academy-page .register-button:hover,
+    .academy-page .register-button:focus {
+        transform: translateY(-2px);
+        background: linear-gradient(135deg, #3e0e79 0%, #611eb2 100%);
+        color: #fff;
+        text-decoration: none;
+        box-shadow: 0 14px 30px rgba(97, 30, 178, 0.32);
+    }
+
+    .academy-page .registration-body {
+        display: grid;
+        grid-template-columns: minmax(0, 1.4fr) minmax(300px, .75fr);
+        gap: 34px;
+        padding: 34px 40px 40px;
+    }
+
+    .academy-page .info-block-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 0 0 18px;
+        color: var(--aces-text);
+        font-size: 18px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    .academy-page .info-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        background: var(--aces-purple-light);
+        color: var(--aces-purple);
+        font-size: 17px;
+    }
+
+    .academy-page .date-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .academy-page .date-card {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-height: 86px;
+        padding: 15px 16px;
+        border: 1px solid var(--aces-border);
+        border-radius: 16px;
+        background: #fff;
+        transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+    }
+
+    .academy-page .date-card:hover {
+        transform: translateY(-2px);
+        border-color: rgba(97, 30, 178, .35);
+        box-shadow: 0 10px 20px rgba(67, 17, 120, .08);
+    }
+
+    .academy-page .date-month {
+        display: flex;
+        flex: 0 0 48px;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 54px;
+        border-radius: 12px;
+        background: var(--aces-purple-light);
+        color: var(--aces-purple-dark);
+        line-height: 1;
+    }
+
+    .academy-page .date-month small {
+        margin-bottom: 4px;
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+    }
+
+    .academy-page .date-month strong {
+        font-size: 20px;
+        font-weight: 900;
+    }
+
+    .academy-page .date-meta strong {
+        display: block;
+        margin-bottom: 3px;
+        color: var(--aces-text);
+        font-size: 15px;
+        font-weight: 800;
+    }
+
+    .academy-page .date-meta span {
+        color: var(--aces-muted);
+        font-size: 13px;
+    }
+
+    .academy-page .teams-panel {
+        height: 100%;
+        padding: 24px;
+        border-radius: 20px;
+        background: linear-gradient(145deg, #4b1188 0%, #611eb2 100%);
+        box-shadow: 0 14px 30px rgba(67, 17, 120, .16);
+    }
+
+    .academy-page .teams-panel .info-block-title {
+        color: #fff;
+    }
+
+    .academy-page .teams-panel .info-icon {
+        background: rgba(255,255,255,.14);
+        color: #fff;
+    }
+
+    .academy-page .team-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .academy-page .team-card {
+        display: flex;
+        min-height: 74px;
+        align-items: center;
+        justify-content: center;
+        padding: 14px;
+        border: 1px solid rgba(255,255,255,.22);
+        border-radius: 15px;
+        background: rgba(255,255,255,.10);
+        color: #fff;
+        font-size: 18px;
+        font-weight: 900;
+        text-align: center;
+        backdrop-filter: blur(4px);
+    }
+
+    .academy-page .teams-note {
+        margin: 18px 0 0;
+        color: rgba(255,255,255,.82);
+        font-size: 13px;
+        line-height: 1.6;
+        text-align: center;
+    }
+
+    @media (max-width: 900px) {
+        .academy-page .registration-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .academy-page .register-button {
+            width: 100%;
+        }
+
+        .academy-page .registration-body {
+            grid-template-columns: 1fr;
+        }
+
+        .academy-page .date-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 575px) {
+        .academy-page .academy-intro,
+        .academy-page .registration-section {
+            width: min(calc(100% - 28px), 1280px);
+        }
+
+        .academy-page .academy-intro {
+            padding-top: 34px;
+        }
+
+        .academy-page .academy-title {
+            margin-bottom: 22px;
+            font-size: 30px;
+        }
+
+        .academy-page .academy-copy p {
+            font-size: 15px;
+            line-height: 1.72;
+        }
+
+        .academy-page .registration-section {
+            margin-top: 24px;
+            margin-bottom: 60px;
+        }
+
+        .academy-page .registration-card {
+            border-radius: 20px;
+        }
+
+        .academy-page .registration-header,
+        .academy-page .registration-body {
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .academy-page .registration-header {
+            padding-top: 30px;
+        }
+
+        .academy-page .registration-body {
+            padding-top: 26px;
+            padding-bottom: 28px;
+        }
+
+        .academy-page .date-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .academy-page .team-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media screen and (min-width: 2560px) {
+        .academy-page .academy-intro,
+        .academy-page .registration-section {
+            max-width: 230rem;
+        }
+
+        .academy-page .academy-title {
+            font-size: 8rem;
+        }
+
+        .academy-page .academy-copy {
+            max-width: 190rem;
+        }
+
+        .academy-page .academy-copy p,
+        .academy-page .registration-subtitle {
+            font-size: 3rem;
+        }
+
+        .academy-page .registration-heading {
+            font-size: 6rem;
+        }
+
+        .academy-page .registration-kicker,
+        .academy-page .register-button,
+        .academy-page .info-block-title,
+        .academy-page .team-card {
+            font-size: 2.5rem;
+        }
+
+        .academy-page .date-meta strong {
+            font-size: 2.2rem;
+        }
+
+        .academy-page .date-meta span,
+        .academy-page .teams-note {
+            font-size: 1.8rem;
+        }
+    }
 </style>
 
-<section class="hero-section">
-    <img src="{{ asset('public/assets/images/aces two.jpg') }}" alt="Our Mission">
-    <div class="overlay"></div>
-    <div class="hero-text">
-    </div>
-</section>
+<div class="academy-page">
+    <section class="hero-section">
+        <img src="{{ asset('public/assets/images/aces two.jpg') }}" alt="ACES Training Academy">
+    </section>
 
-<section class="academy-section">
+    <section class="academy-intro">
+        <h1 class="academy-title">ACES TRAINING ACADEMY</h1>
 
-    <h2>ACES TRAINING ACADEMY</h2>
-    <p>
-        Sacramento ACES is the Sacramento Valley’s premier lacrosse training organization. ACES Academy consists of training sessions designed to enhance skill, athletic ability, and lacrosse acumen. No detail is too small when it comes to developing a player’s game. ACES Academy features the most experienced coaching staff in the region; <a href="https://aceslacrosse.com/pages/coaching-staff" target="_blank" class="text-decoration-underline " style="color:#76139a;">ACES Academy staff</a>.consists of college coaches, current and former professional and NCAA players, some of the area's top high school coaches, and boasts over 500 years of combined coaching and playing experience.
-<br><br>ACES Academy teams participate in Sacramento area games as well as regional Northern California tournaments. In addition to Academy games and tournaments, ACES Academy players are the first to be called up to an ACES Elite team when a roster spot for a tournament becomes available and each season, numerous ACES Academy players have received invitations to join ACES Elite teams. This is because it is our philosophy to promote from within and provide the highest performing Academy members the chance for greater opportunities when they present themselves.
-    </p>
-</section>
+        <div class="academy-copy">
+            <p>
+                ACES Academy is Sacramento’s premier local training foundation focusing on fundamentals, high-volume reps, skill development, and fun! Each session is designed to enhance athletic ability, technical skill, and overall lacrosse IQ—because no detail is too small when building a player’s game.
+            </p>
 
-<!-- Evaluation Section -->
-{{-- <section class="evaluation-section">
-  <div class="evaluation-overlay">
-    <img src="{{ asset('public/assets/images/aces-evaluation-bg.jpg') }}" alt="ACES EVALUATION">
-  </div>
-  <div class="evaluation-content">
-    <h1>ACES EVALUATION<br>2025/2026 TRYOUTS</h1>
-    <p>Are you interested in joining the ACES for training 2025 but can't make out tryout?</p>
+            <p>
+                ACES staff includes current and former professional players, NCAA alumni, and top area coaches, combining over 500 years of playing and coaching expertise. Utilizing a proven curriculum developed by the program directors, our ACES Academy coaches ensure every athlete receives top-tier instruction tailored to their growth.
+            </p>
 
-    <div class="assessment-box mt-4">
-      <h2>ACES ASSESSMENT</h2>
-      <p>Please Register for a Group Assessment and<br>we'll coordinate a time for evaluation</p>
+            <p>
+                While our primary focus is on foundational development, ACES Academy players gain opportunities to compete in local games and earn call-ups to ACES Elite tournament rosters. We firmly believe in promoting from within. Dozens of ACES Academy alumni have earned spots on ACES Elite and Pinnacle teams and gone on to play college lacrosse, proving that dedication to the basics opens doors to the highest level.
+            </p>
+        </div>
+    </section>
 
-    </div>
-        <!-- Register Button below the assessment box -->
-    <div class="mt-3">
-      <a href="https://registration.teamsnap.com/form/38469" class="btn btn-register" target="_blank" rel="noopener">Register Now</a>
-    </div>
-  </div>
-</section> --}}
+    <section class="registration-section" aria-labelledby="academy-registration-title">
+        <div class="registration-card">
+            <div class="registration-header">
+                <div class="registration-heading-wrap">
+                    <div class="registration-kicker">2026 Academy Sessions</div>
+                    <h2 class="registration-heading" id="academy-registration-title">Train With ACES This Fall &amp; Winter</h2>
+                    <p class="registration-subtitle">
+                        Six Sunday training dates for U10, U12, U14, and High School players. Reserve your player’s spot through TeamSnap.
+                    </p>
+                </div>
 
-{{-- <section>
-  <div class="container">
-    <a href="https://registration.teamsnap.com/form/46426" target="__blank">
-    <img src="{{ asset('public/assets/images/AcesTryouts_5.jpg') }}" class="banner-image" alt="">
-    </a>
-  </div>
-</section> --}}
+                <a href="https://registration.teamsnap.com/form/77536"
+                   class="register-button"
+                   target="_blank"
+                   rel="noopener noreferrer">
+                    Register Now <span aria-hidden="true">→</span>
+                </a>
+            </div>
 
-{{-- Fall/Winter calender --}}
+            <div class="registration-body">
+                <div>
+                    <h3 class="info-block-title">
+                        <span class="info-icon" aria-hidden="true">▣</span>
+                        Sunday Schedule
+                    </h3>
 
-{{-- <section class="tournaments-section">
-  <h2>TOURNAMENTS</h2>
+                    <div class="date-grid">
+                        <div class="date-card">
+                            <div class="date-month"><small>Nov</small><strong>8</strong></div>
+                            <div class="date-meta"><strong>November 8</strong><span>Sunday</span></div>
+                        </div>
+                        <div class="date-card">
+                            <div class="date-month"><small>Nov</small><strong>15</strong></div>
+                            <div class="date-meta"><strong>November 15</strong><span>Sunday</span></div>
+                        </div>
+                        <div class="date-card">
+                            <div class="date-month"><small>Nov</small><strong>22</strong></div>
+                            <div class="date-meta"><strong>November 22</strong><span>Sunday</span></div>
+                        </div>
+                        <div class="date-card">
+                            <div class="date-month"><small>Dec</small><strong>6</strong></div>
+                            <div class="date-meta"><strong>December 6</strong><span>Sunday</span></div>
+                        </div>
+                        <div class="date-card">
+                            <div class="date-month"><small>Dec</small><strong>13</strong></div>
+                            <div class="date-meta"><strong>December 13</strong><span>Sunday</span></div>
+                        </div>
+                        <div class="date-card">
+                            <div class="date-month"><small>Dec</small><strong>20</strong></div>
+                            <div class="date-meta"><strong>December 20</strong><span>Sunday</span></div>
+                        </div>
+                    </div>
+                </div>
 
-  <div class="tournament-grid">
-    <!-- 1 -->
-    <div class="tournament-card pink">
-      <div class="corner-dot"></div>
-      <h3>SANTA BARBARA FALL BRAWL</h3>
-      <div class="tournament-info date-badge">📅 October 25–26</div>
-      <div class="tournament-info">📍 Santa Barbara Polo Club</div>
-      <a href="#" class="tournament-btn">VARSITY, JV ELITE</a>
-    </div>
+                <aside class="teams-panel">
+                    <h3 class="info-block-title">
+                        <span class="info-icon" aria-hidden="true">◆</span>
+                        Teams
+                    </h3>
 
-    <!-- 2 -->
-    <div class="tournament-card blue">
-      <div class="corner-dot"></div>
-      <h3>HALLOWEEN HACKFEST</h3>
-      <div class="tournament-info date-badge">📅 November 1–2</div>
-      <div class="tournament-info">📍 Kirigan Cellars</div>
-      <a href="#" class="tournament-btn">14U, 12U, 10U</a>
-    </div>
+                    <div class="team-grid">
+                        <div class="team-card">U10</div>
+                        <div class="team-card">U12</div>
+                        <div class="team-card">U14</div>
+                        <div class="team-card">HS</div>
+                    </div>
 
-    <!-- 3 -->
-    <div class="tournament-card green">
-      <div class="corner-dot"></div>
-      <h3>SACTOWN SIXES</h3>
-      <div class="tournament-info date-badge">📅 December 6–7</div>
-      <div class="tournament-info">📍 Bartholomew Sports Park</div>
-      <a href="#" class="tournament-btn">VARSITY, JV ELITE, U14, U12, U10</a>
-    </div>
-
-    <!-- 4 -->
-    <div class="tournament-card orange">
-      <div class="corner-dot"></div>
-      <h3>GOLD RUSH</h3>
-      <div class="tournament-info date-badge">📅 December 13–14</div>
-      <div class="tournament-info">📍 Petaluma Community Sports Fields</div>
-      <a href="#" class="tournament-btn">JV ELITE, 14U, 10U</a>
-    </div>
-
-    <!-- 5 -->
-    <div class="tournament-card violet">
-      <div class="corner-dot"></div>
-      <h3>KING'S SHOWCASE</h3>
-      <div class="tournament-info date-badge">📅 January 24–25</div>
-      <div class="tournament-info">📍 Beach Chalet Fields, San Francisco</div>
-      <a href="#" class="tournament-btn">VARSITY, JV ELITE, U14, U12, U10</a>
-    </div>
-  </div>
-</section> --}}
-
-{{-- summer calendar --}}
-
-{{-- <section class="tournaments-section">
-  <h2>SUMMER TOURNAMENTS</h2>
-
-  <div class="tournament-grid">
-    <!-- 1 -->
-    <div class="tournament-card pink">
-      <div class="corner-dot"></div>
-      <h3>BATTLE OF THE BAY</h3>
-      <div class="tournament-info date-badge">📅 June 06–07</div>
-      <div class="tournament-info">📍 Golden Gate Park Polo Field</div>
-      <a href="#" class="tournament-btn">VARSITY, JV ELITE, U14, U12, U10</a>
-    </div>
-
-    <!-- 2 -->
-    <div class="tournament-card blue">
-      <div class="corner-dot"></div>
-      <h3>ROGUE VALLEY RISING</h3>
-      <div class="tournament-info date-badge">📅 June 27–28</div>
-      <div class="tournament-info">📍 Medford, Oregon</div>
-      <a href="#" class="tournament-btn">VARSITY, JV ELITE, U14, U12, U10</a>
-    </div>
-
-    <!-- 3 -->
-    <div class="tournament-card green">
-      <div class="corner-dot"></div>
-      <h3>GRAPEVINE CLASSIC</h3>
-      <div class="tournament-info date-badge">📅 July 11–12</div>
-      <div class="tournament-info">📍 A Place To Play</div>
-      <a href="#" class="tournament-btn">VARSITY, JV ELITE, U14, U12, U10</a>
-    </div>
-  </div>
-</section> --}}
-<section class="team-section">
-  <div class="team-container">
-    <!-- LEFT SIDE TEXT -->
-    <div class="team-content">
-      <h2>TEAM</h2>
-      <ul>
-        <li>
-          <span class="check-icon">✔</span>
-          Small sided team concepts to maximize repetitions
-        </li>
-        <li>
-          <span class="check-icon">✔</span>
-          6v6 Samurai style games
-        </li>
-        <li>
-          <span class="check-icon">✔</span>
-          Settled and Transition team play dynamics
-        </li>
-        <li>
-          <span class="check-icon">✔</span>
-          High repetition play to ingrain concepts at game speed
-        </li>
-      </ul>
-    </div>
-
-    <!-- RIGHT SIDE IMAGE -->
-    <div class="team-image">
-      <img src="{{ asset('public/assets/images/4.jpg') }}" alt="Team Practice">
-    </div>
-  </div>
-</section>
-
-<!-- OFFENSE SECTION -->
-<section class="offense-section">
-  <div class="offense-container">
-    <div class="offense-content">
-      <h2>OFFENSE</h2>
-      <ul>
-        <li><span class="check-icon">✔</span>Teaching the fundamentals of passing with correct form from various release points</li>
-        <li><span class="check-icon">✔</span>Catching the ball with appropriate grips in tight, mid range shallow cuts, coming up field below goal line extended and posting up top. Catch the balls with soft hands and deep or catching in front and keeping in front to avoid a trailing defender.</li>
-        <li><span class="check-icon">✔</span>Dodging approaches & options coming out of the dodge as well as dodging off the pass with an approaching defender.</li>
-        <li><span class="check-icon">✔</span>Swing passes or one more feeds</li>
-        <li><span class="check-icon">✔</span>Taking off ball inventory</li>
-        <li><span class="check-icon">✔</span>Finding cutting lanes or skip passing lanes.</li>
-        <li><span class="check-icon">✔</span>Offensive communication.</li>
-        <li><span class="check-icon">✔</span>Shooting techniques from different release points.</li>
-        <li><span class="check-icon">✔</span>Odd man situations to identify the 2 on 1</li>
-        <li><span class="check-icon">✔</span>Man up offense-Small sided games.</li>
-        <li><span class="check-icon">✔</span>Riding affectively.</li>
-        <li><span class="check-icon">✔</span>Ground Balls</li>
-        <li><span class="check-icon">✔</span>Creating slickness via multiple stick handling progressions</li>
-        <li><span class="check-icon">✔</span>
-Learning to utilize stick fakes to freeze slides, shift defenses and misdirect sticks in passing lanes</li>
-
-      </ul>
-    </div>
-
-    <div class="offense-images">
-      <div class="offense-img">
-        <img src="{{ asset('public/assets/images/2.jpg') }}" alt="Offense Practice 1">
-      </div>
-      <div class="offense-img">
-        <img src="{{ asset('public/assets/images/3.jpg') }}" alt="Offense Practice 2">
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- DEFENCE SECTION -->
-<section class="offense-section">
-  <div class="offense-container">
-    <div class="offense-content">
-      <h2>DEFENSE</h2>
-      <ul>
-        <li><span class="check-icon">✔</span>Defensive positioning, footwork and approaches.</li>
-        <li><span class="check-icon">✔</span>Off ball positioning.</li>
-        <li><span class="check-icon">✔</span>Defensive toolbox checks and bumps.</li>
-        <li><span class="check-icon">✔</span>Man down defense</li>
-        <li><span class="check-icon">✔</span>Getting sticks up in passing lanes.</li>
-        <li><span class="check-icon">✔</span>Sliding the correct way and teaching how to make contact the correct way</li>
-        <li><span class="check-icon">✔</span>Being a threat to pass, feed and shoot.</li>
-        <li><span class="check-icon">✔</span>Creating slickness via multiple stick handling progressions</li>
-        <li><span class="check-icon">✔</span>Defensive communication.</li>
-        <li><span class="check-icon">✔</span>Ground Balls</li>
-        <li><span class="check-icon">✔</span>Small sided games.</li>
-        <li><span class="check-icon">✔</span>Odd man situations and reads.</li>
-
-      </ul>
-    </div>
-
-    <div class="offense-images">
-      <div class="offense-img">
-        <img src="{{ asset('public/assets/images/1.jpg') }}" alt="Offense Practice 1">
-      </div>
-
-    </div>
-  </div>
-</section>
-<!-- GOALIES SECTION -->
-<section class="goalies-section">
-  <div class="goalies-container">
-    <h2>GOALIES</h2>
-    <p>
-      <span class="check-icon">✔</span>
-      Goalies will work on positioning, baiting, stance, not giving up rebounds, communication,
-      outlets, playing small sides games to work on stick skills and footwork.
-    </p>
-  </div>
-</section>
-
-<!-- FACE OFF AND WING PLAY SECTION -->
-<section class="faceoff-section">
-  <div class="faceoff-container">
-    <h2>FACE OFF AND WING PLAY</h2>
-    <p>
-      <span class="check-icon">✔</span>
-      Stance, reads, outs, wingmen adjustments, listening for calls from sideline, shooting, feeding,
-      passing, defensive toolbox building to be confident if they get stuck on defense.
-      We will also cover the cat and mouse game of substitution.
-    </p>
-  </div>
-</section>
-
-
+                    <p class="teams-note">
+                        Academy training is built around fundamentals, repetition, development, lacrosse IQ, and fun.
+                    </p>
+                </aside>
+            </div>
+        </div>
+    </section>
+</div>
 @endsection
