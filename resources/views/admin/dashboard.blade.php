@@ -3,10 +3,9 @@
 @section('page-title','Dashboard')
 @section('content')
 <div class="row g-3 mb-3">
-    <div class="col-12 col-sm-6 col-xl-3"><div class="kpi-card"><div class="kpi-icon"><i class="fa-solid fa-user-group"></i></div><div><div class="kpi-label">Total Parents</div><div class="kpi-value">{{ number_format($totalParents) }}</div><div class="kpi-meta"><i class="fa-solid fa-arrow-up"></i> Active parent accounts</div></div></div></div>
-    <div class="col-12 col-sm-6 col-xl-3"><div class="kpi-card"><div class="kpi-icon"><i class="fa-solid fa-user-shield"></i></div><div><div class="kpi-label">Total Players</div><div class="kpi-value">{{ number_format($totalPlayers) }}</div><div class="kpi-meta"><i class="fa-solid fa-arrow-up"></i> Active players</div></div></div></div>
-    <div class="col-12 col-sm-6 col-xl-3"><div class="kpi-card"><div class="kpi-icon"><i class="fa-regular fa-calendar-check"></i></div><div><div class="kpi-label">Total Bookings</div><div class="kpi-value">{{ number_format($totalBookings) }}</div><div class="kpi-meta"><i class="fa-solid fa-arrow-up"></i> Confirmed bookings only</div></div></div></div>
-    <div class="col-12 col-sm-6 col-xl-3"><div class="kpi-card"><div class="kpi-icon"><i class="fa-solid fa-dollar-sign"></i></div><div><div class="kpi-label">Pending Payments</div><div class="kpi-value">${{ number_format($pendingPayments,2) }}</div><div class="kpi-meta"><i class="fa-solid fa-circle"></i> Awaiting completion</div></div></div></div>
+    <div class="col-12 col-sm-6 col-xl-4"><div class="kpi-card"><div class="kpi-icon"><i class="fa-solid fa-user-group"></i></div><div><div class="kpi-label">Total Parents</div><div class="kpi-value">{{ number_format($totalParents) }}</div><div class="kpi-meta"><i class="fa-solid fa-arrow-up"></i> Active parent accounts</div></div></div></div>
+    <div class="col-12 col-sm-6 col-xl-4"><div class="kpi-card"><div class="kpi-icon"><i class="fa-solid fa-user-shield"></i></div><div><div class="kpi-label">Total Players</div><div class="kpi-value">{{ number_format($totalPlayers) }}</div><div class="kpi-meta"><i class="fa-solid fa-arrow-up"></i> Active players</div></div></div></div>
+    <div class="col-12 col-sm-6 col-xl-4"><div class="kpi-card"><div class="kpi-icon"><i class="fa-regular fa-calendar-check"></i></div><div><div class="kpi-label">Total Bookings</div><div class="kpi-value">{{ number_format($totalBookings) }}</div><div class="kpi-meta"><i class="fa-solid fa-arrow-up"></i> Confirmed bookings only</div></div></div></div>
 </div>
 <div class="dashboard-grid">
     <div class="dashboard-main">
