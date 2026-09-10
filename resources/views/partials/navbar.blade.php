@@ -637,7 +637,7 @@
                     <img src="{{ asset('public/assets/images/ACES-logo.webp') }}" alt="ACES Logo">
                 </a>
 
-                <div class="header-actions">
+                {{-- <div class="header-actions">
                     <a href="{{ $trainingCartUrl }}" class="header-action-btn" aria-label="Training cart">
                         <i class="fa-solid fa-cart-shopping"></i>
                         @if($trainingLoggedIn && $trainingCartCount > 0)
@@ -688,7 +688,7 @@
                             <span class="training-profile-initials"><i class="fa-regular fa-user"></i></span>
                         </a>
                     @endif
-                </div>
+                </div> --}}
             </div>
 
             <ul class="nav-menu">
@@ -715,7 +715,7 @@
                         <a href="{{ URL('/pages/aces-grow-your-game-davis') }}" class="nav-item dropdown {{ request()->is('pages/aces-grow-your-game-davis') ? 'active' : '' }}">Grow Your Game - Davis</a>
                     </div>
                 </li>
-                <li><a href="{{ route('em.customer.index') }}" class="nav-item {{ request()->is('training*') ? 'active' : '' }}">Training</a></li>
+                {{-- <li><a href="{{ route('em.customer.index') }}" class="nav-item {{ request()->is('training*') ? 'active' : '' }}">Training</a></li> --}}
                 <li><a href="{{ URL('/pages/contact-us') }}" class="nav-item {{ request()->is('pages/contact-us') ? 'active' : '' }}">Contact Us</a></li>
             </ul>
         </div>
@@ -728,7 +728,7 @@
                     <img src="{{ asset('public/assets/images/ACES-logo.webp') }}" alt="ACES Logo">
                 </a>
 
-                <div class="header-actions mobile-header-actions">
+                {{-- <div class="header-actions mobile-header-actions">
                     <a href="{{ $trainingCartUrl }}" class="header-action-btn" aria-label="Training cart">
                         <i class="fa-solid fa-cart-shopping"></i>
                         @if($trainingLoggedIn && $trainingCartCount > 0)
@@ -772,7 +772,7 @@
                             <span class="training-profile-initials"><i class="fa-regular fa-user"></i></span>
                         </a>
                     @endif
-                </div>
+                </div> --}}
             </div>
         </div>
     </div>
@@ -807,7 +807,7 @@
                 <a href="{{ URL('/pages/aces-grow-your-game-davis') }}" class="mobile {{ request()->is('pages/aces-grow-your-game-davis') ? 'active' : '' }}">Grow Your Game - Davis</a>
             </div>
         </li>
-        <li><a href="{{ route('em.customer.index') }}" class="mobile {{ request()->is('training*') ? 'active' : '' }}">Training</a></li>
+        {{-- <li><a href="{{ route('em.customer.index') }}" class="mobile {{ request()->is('training*') ? 'active' : '' }}">Training</a></li> --}}
         <li><a href="{{ URL('/pages/contact-us') }}" class="mobile {{ request()->is('pages/contact-us') ? 'active' : '' }}">Contact Us</a></li>
     </ul>
 </div>
