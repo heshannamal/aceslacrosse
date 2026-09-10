@@ -25,8 +25,86 @@
     </template>
 @endforeach
 
+<style>
+    .booking-page .booking-held-date-input {
+        color-scheme: light;
+        cursor: pointer;
+        font-weight: 700;
+        background: #fff;
+    }
+
+    .booking-page .booking-held-date-input:focus {
+        outline: 0;
+        border-color: #611eb2 !important;
+        box-shadow: 0 0 0 3px rgba(97, 30, 178, .12) !important;
+    }
+
+    .booking-page .booking-held-date-input::-webkit-calendar-picker-indicator {
+        cursor: pointer;
+        opacity: .72;
+    }
+</style>
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    function shortReference(value) {
+        var text = (value || '').toString().trim();
+        if (!text) {
+            return text;
+        }
+
+        var parts = text.split('-').filter(Boolean);
+        return parts.length > 1 ? parts[parts.length - 1] : text;
+    }
+
+    // Match the Baddies-style Session Held Date experience with a calendar picker
+    // while preserving the existing server-side session_date GET filter.
+    var heldDateSelect = document.querySelector('.booking-page form.filter-grid select[name="session_date"]');
+    if (heldDateSelect) {
+        var heldDateInput = document.createElement('input');
+        heldDateInput.type = 'date';
+        heldDateInput.name = 'session_date';
+        heldDateInput.value = heldDateSelect.value || '';
+        heldDateInput.className = (heldDateSelect.className || 'filter-input') + ' booking-held-date-input';
+        heldDateInput.setAttribute('aria-label', 'Session Held Date');
+        heldDateInput.setAttribute('title', 'Select held date');
+        heldDateSelect.replaceWith(heldDateInput);
+    }
+
+    // Show only the final token of generated booking references, e.g.
+    // BKG-20260909-XQAPFO -> XQAPFO. Keep the full reference in the title.
+    document.querySelectorAll('.booking-table tbody tr').forEach(function (row) {
+        var firstCell = row.children[0];
+        if (!firstCell) {
+            return;
+        }
+
+        var strong = firstCell.querySelector('strong');
+        if (!strong) {
+            return;
+        }
+
+        var fullCode = strong.textContent.trim();
+        if (!fullCode) {
+            return;
+        }
+
+        strong.title = fullCode;
+        strong.dataset.fullReference = fullCode;
+        strong.textContent = shortReference(fullCode);
+    });
+
+    // Keep the booking detail modal consistent with the shortened table display.
+    document.querySelectorAll('[id^="bookingDetail"] .modal-header h5').forEach(function (heading) {
+        var fullCode = heading.textContent.trim();
+        if (!fullCode) {
+            return;
+        }
+
+        heading.title = fullCode;
+        heading.textContent = shortReference(fullCode);
+    });
+
     // Run after the Baddies-style modal replacement callback registered above this partial.
     window.requestAnimationFrame(function () {
         // The table row should open details only when a non-interactive area is clicked.
