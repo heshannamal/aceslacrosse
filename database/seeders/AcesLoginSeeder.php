@@ -6,9 +6,7 @@ use App\Models\EMCustomer;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
-use RuntimeException;
 
 class AcesLoginSeeder extends Seeder
 {
@@ -17,21 +15,15 @@ class AcesLoginSeeder extends Seeder
      */
     public function run(): void
     {
-        $trainingPassword = env('ACES_TRAINING_SEED_PASSWORD');
-        $adminPassword = env('ACES_ADMIN_SEED_PASSWORD');
-
-        if (!$trainingPassword || !$adminPassword) {
-            throw new RuntimeException(
-                'Set ACES_TRAINING_SEED_PASSWORD and ACES_ADMIN_SEED_PASSWORD in .env before running AcesLoginSeeder.'
-            );
-        }
+        $trainingPasswordHash = '$2y$12$abue5FePsdZroY605LRIse5q61pCwBmhxZJe8Qa2mbGEsytMi9OAi';
+        $adminPasswordHash = '$2y$12$nIUCGj3mP1mjeptL.J.RY.q9hstVuMcJ975a4SkymUYlZcL1F/kYm';
 
         EMCustomer::query()->updateOrCreate(
             ['email' => 'customer@aceslacrosse.com'],
             [
                 'first_name' => 'ACES',
                 'last_name' => 'Customer',
-                'password' => Hash::make($trainingPassword),
+                'password' => $trainingPasswordHash,
                 'email_verified_at' => now(),
                 'parent_type' => 1,
                 'account_type' => EMCustomer::ACCOUNT_TYPE_USER,
@@ -43,7 +35,7 @@ class AcesLoginSeeder extends Seeder
             ['email' => 'superadmin@aceslacrosse.com'],
             [
                 'name' => 'Super Admin',
-                'password' => Hash::make($adminPassword),
+                'password' => $adminPasswordHash,
                 'email_verified_at' => now(),
                 'is_admin' => true,
             ]
