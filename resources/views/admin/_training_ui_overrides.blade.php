@@ -123,6 +123,16 @@
         .member-panel {
             padding: 14px !important;
         }
+        .member-action.btn-outline-primary {
+            color: #611eb2 !important;
+            border-color: #611eb2 !important;
+            background: #fff !important;
+        }
+        .member-action.btn-outline-primary:hover {
+            color: #fff !important;
+            border-color: #611eb2 !important;
+            background: #611eb2 !important;
+        }
     @endif
 
     @if(request()->routeIs('admin.bookings.session-wise'))
@@ -146,14 +156,19 @@
             color: #fff !important;
             border-color: #611eb2 !important;
         }
-        .booking-page .booking-count-badge,
         .booking-page .add-booking-btn {
             background: #611eb2 !important;
             color: #fff !important;
+            box-shadow: 0 10px 24px rgba(97, 30, 178, .22) !important;
         }
         .booking-page .booking-count-badge {
             background: #f4edfc !important;
             color: #611eb2 !important;
+        }
+        .booking-page .filter-input:focus,
+        .booking-page .filter-select:focus {
+            border-color: #611eb2 !important;
+            box-shadow: 0 0 0 3px rgba(97, 30, 178, .12) !important;
         }
     @endif
 
@@ -165,10 +180,26 @@
         .pay-table-card {
             padding: 12px !important;
         }
-        .pay-table .badge,
-        .pay-table .payment-method-badge {
+        .pay-filter .btn-primary {
+            background: #611eb2 !important;
+            border-color: #611eb2 !important;
+        }
+        .pay-filter .btn-primary:hover {
+            background: #4d168f !important;
+            border-color: #4d168f !important;
+        }
+        .payment-method-badge {
+            display: inline-flex !important;
+            align-items: center;
+            justify-content: center;
+            padding: 3px 8px !important;
+            border-radius: 999px !important;
             background: #f4edfc !important;
             color: #611eb2 !important;
+            font-size: 11px !important;
+            line-height: 1.1 !important;
+            font-weight: 800 !important;
+            text-transform: capitalize !important;
         }
     @endif
 </style>
@@ -211,6 +242,30 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }, 0);
         });
+    });
+});
+</script>
+@endif
+
+@if(request()->routeIs('admin.payments.index'))
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.pay-table tbody .payment-row').forEach(function (row) {
+        var methodCell = row.children[5];
+        if (!methodCell || methodCell.querySelector('.payment-method-badge')) {
+            return;
+        }
+
+        var method = (methodCell.textContent || '').trim();
+        if (!method || method === '—' || method === '-') {
+            return;
+        }
+
+        methodCell.textContent = '';
+        var badge = document.createElement('span');
+        badge.className = 'payment-method-badge';
+        badge.textContent = method.toLowerCase();
+        methodCell.appendChild(badge);
     });
 });
 </script>
