@@ -86,6 +86,7 @@
         .booking-table td,
         .pay-table td {
             font-size: 12px !important;
+            white-space: nowrap !important;
         }
 
         .member-table strong,
