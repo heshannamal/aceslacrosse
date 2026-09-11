@@ -81,13 +81,6 @@ class TrainingEmailTestController extends Controller
                 'trigger' => 'A Training package/order payment completes successfully.',
                 'icon' => 'fa-receipt',
             ],
-            'booking-confirmed' => [
-                'name' => 'Booking Confirmed',
-                'subject' => 'Training booking confirmed - ACES Lacrosse',
-                'view' => 'emails.training.booking-confirmed',
-                'trigger' => 'A non-paid-order booking is confirmed, such as a credit booking.',
-                'icon' => 'fa-calendar-check',
-            ],
             'booking-updated' => [
                 'name' => 'Booking Updated',
                 'subject' => 'Your ACES Lacrosse session was updated',
