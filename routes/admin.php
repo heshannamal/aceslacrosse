@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\SessionController;
+use App\Http\Controllers\Admin\TrainingEmailTestController;
 use App\Http\Controllers\Admin\UserGroupController;
 use Illuminate\Support\Facades\Route;
 
@@ -53,6 +54,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::put('/schedules/sessions/{session}', [SessionController::class, 'update'])->name('em.sessions.update');
             Route::delete('/schedules/sessions/{session}', [SessionController::class, 'destroy'])->name('em.sessions.destroy');
             Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
+
+            Route::get('/email-testing', [TrainingEmailTestController::class, 'index'])->name('email-tests.index');
+            Route::post('/email-testing/{type}/send', [TrainingEmailTestController::class, 'send'])->name('email-tests.send');
         });
 
         Route::middleware('admin.permission:manage_permissions')->group(function () {
