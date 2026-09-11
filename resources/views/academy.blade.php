@@ -158,7 +158,7 @@
 
     .academy-page .registration-body {
         display: grid;
-        grid-template-columns: minmax(0, 1.4fr) minmax(300px, .75fr);
+        grid-template-columns: minmax(0, 1.4fr) minmax(320px, .8fr);
         gap: 34px;
         padding: 34px 40px 40px;
     }
@@ -251,7 +251,7 @@
         font-size: 13px;
     }
 
-    .academy-page .teams-panel {
+    .academy-page .details-panel {
         height: 100%;
         padding: 24px;
         border-radius: 20px;
@@ -259,11 +259,11 @@
         box-shadow: 0 14px 30px rgba(67, 17, 120, .16);
     }
 
-    .academy-page .teams-panel .info-block-title {
+    .academy-page .details-panel .info-block-title {
         color: #fff;
     }
 
-    .academy-page .teams-panel .info-icon {
+    .academy-page .details-panel .info-icon {
         background: rgba(255,255,255,.14);
         color: #fff;
     }
@@ -272,17 +272,18 @@
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 12px;
+        margin-bottom: 18px;
     }
 
     .academy-page .team-card {
         display: flex;
-        min-height: 74px;
+        min-height: 66px;
         align-items: center;
         justify-content: center;
         padding: 14px;
-        border: 1px solid rgba(255,255,255,.22);
+        border: 1px solid rgba(255,255,255,.24);
         border-radius: 15px;
-        background: rgba(255,255,255,.10);
+        background: rgba(255,255,255,.12);
         color: #fff;
         font-size: 18px;
         font-weight: 900;
@@ -290,12 +291,67 @@
         backdrop-filter: blur(4px);
     }
 
-    .academy-page .teams-note {
-        margin: 18px 0 0;
-        color: rgba(255,255,255,.82);
-        font-size: 13px;
-        line-height: 1.6;
-        text-align: center;
+    .academy-page .session-details {
+        display: grid;
+        gap: 10px;
+    }
+
+    .academy-page .detail-card {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        min-height: 72px;
+        padding: 14px 15px;
+        border: 1px solid rgba(255,255,255,.18);
+        border-radius: 15px;
+        background: rgba(255,255,255,.09);
+        color: #fff;
+    }
+
+    .academy-page .detail-icon {
+        display: inline-flex;
+        flex: 0 0 38px;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+        border-radius: 11px;
+        background: rgba(255,255,255,.14);
+        font-size: 17px;
+    }
+
+    .academy-page .detail-content {
+        min-width: 0;
+    }
+
+    .academy-page .detail-label {
+        display: block;
+        margin-bottom: 2px;
+        color: rgba(255,255,255,.68);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+    }
+
+    .academy-page .detail-value,
+    .academy-page .detail-link {
+        color: #fff;
+        font-size: 15px;
+        font-weight: 800;
+        line-height: 1.4;
+    }
+
+    .academy-page .detail-link {
+        text-decoration: underline;
+        text-decoration-thickness: 1px;
+        text-underline-offset: 3px;
+    }
+
+    .academy-page .detail-link:hover,
+    .academy-page .detail-link:focus {
+        color: #fff;
+        opacity: .88;
     }
 
     @media (max-width: 900px) {
@@ -400,12 +456,14 @@
             font-size: 2.5rem;
         }
 
-        .academy-page .date-meta strong {
+        .academy-page .date-meta strong,
+        .academy-page .detail-value,
+        .academy-page .detail-link {
             font-size: 2.2rem;
         }
 
         .academy-page .date-meta span,
-        .academy-page .teams-note {
+        .academy-page .detail-label {
             font-size: 1.8rem;
         }
     }
@@ -441,7 +499,7 @@
                     <div class="registration-kicker">2026 Academy Sessions</div>
                     <h2 class="registration-heading" id="academy-registration-title">Train With ACES This Fall &amp; Winter</h2>
                     <p class="registration-subtitle">
-                        Six Sunday training dates for U10, U12, U14, and High School players. Reserve your player’s spot through TeamSnap.
+                        Six Sunday training dates for U10 and U12 players. Reserve your player’s spot through TeamSnap.
                     </p>
                 </div>
 
@@ -488,22 +546,47 @@
                     </div>
                 </div>
 
-                <aside class="teams-panel">
+                <aside class="details-panel">
                     <h3 class="info-block-title">
                         <span class="info-icon" aria-hidden="true">◆</span>
-                        Teams
+                        Session Details
                     </h3>
 
                     <div class="team-grid">
                         <div class="team-card">U10</div>
                         <div class="team-card">U12</div>
-                        <div class="team-card">U14</div>
-                        <div class="team-card">HS</div>
                     </div>
 
-                    <p class="teams-note">
-                        Academy training is built around fundamentals, repetition, development, lacrosse IQ, and fun.
-                    </p>
+                    <div class="session-details">
+                        <div class="detail-card">
+                            <span class="detail-icon" aria-hidden="true">⌖</span>
+                            <div class="detail-content">
+                                <span class="detail-label">Location</span>
+                                <a href="https://maps.app.goo.gl/Zt7KfP5T5oK8pXhU6"
+                                   class="detail-link"
+                                   target="_blank"
+                                   rel="noopener noreferrer">
+                                    Mather Sports Complex
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="detail-card">
+                            <span class="detail-icon" aria-hidden="true">◷</span>
+                            <div class="detail-content">
+                                <span class="detail-label">Time</span>
+                                <span class="detail-value">10:00 AM – 11:30 AM</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-card">
+                            <span class="detail-icon" aria-hidden="true">$</span>
+                            <div class="detail-content">
+                                <span class="detail-label">Cost</span>
+                                <span class="detail-value">$395</span>
+                            </div>
+                        </div>
+                    </div>
                 </aside>
             </div>
         </div>
