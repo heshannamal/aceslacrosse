@@ -17,6 +17,7 @@
             <a href="{{ route('admin.em.packages.index') }}" class="sidebar-link {{ request()->routeIs('admin.em.packages.*') ? 'active' : '' }}"><i class="fa-solid fa-box-open"></i><span>Packages</span></a>
             <a href="{{ route('admin.em.sessions.index') }}" class="sidebar-link {{ request()->routeIs('admin.em.sessions.*') ? 'active' : '' }}"><i class="fa-solid fa-calendar-days"></i><span>Sessions</span></a>
             <a href="{{ route('admin.payments.index') }}" class="sidebar-link {{ request()->routeIs('admin.payments.*') ? 'active' : '' }}"><i class="fa-solid fa-credit-card"></i><span>Payments</span></a>
+            <a href="{{ route('admin.email-tests.index') }}" class="sidebar-link {{ request()->routeIs('admin.email-tests.*') ? 'active' : '' }}"><i class="fa-solid fa-envelope-open-text"></i><span>Email Testing</span></a>
         @endif
         @if($canSettings)
             <div class="settings-menu {{ $settingsActive ? 'open' : '' }}">
