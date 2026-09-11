@@ -637,7 +637,7 @@
                     <img src="{{ asset('public/assets/images/ACES-logo.webp') }}" alt="ACES Logo">
                 </a>
 
-                {{-- <div class="header-actions">
+                <div class="header-actions">
                     <a href="{{ $trainingCartUrl }}" class="header-action-btn" aria-label="Training cart">
                         <i class="fa-solid fa-cart-shopping"></i>
                         @if($trainingLoggedIn && $trainingCartCount > 0)
@@ -688,7 +688,7 @@
                             <span class="training-profile-initials"><i class="fa-regular fa-user"></i></span>
                         </a>
                     @endif
-                </div> --}}
+                </div>
             </div>
 
             <ul class="nav-menu">
@@ -727,15 +727,13 @@
                 <a href="{{ URL('/') }}" class="mobile-brand">
                     <img src="{{ asset('public/assets/images/ACES-logo.webp') }}" alt="ACES Logo">
                 </a>
-
-                {{-- <div class="header-actions mobile-header-actions">
+                <div class="header-actions mobile-header-actions">
                     <a href="{{ $trainingCartUrl }}" class="header-action-btn" aria-label="Training cart">
                         <i class="fa-solid fa-cart-shopping"></i>
                         @if($trainingLoggedIn && $trainingCartCount > 0)
                             <span class="header-cart-badge">{{ $trainingCartCount > 99 ? '99+' : $trainingCartCount }}</span>
                         @endif
                     </a>
-
                     @if($trainingLoggedIn)
                         <div class="training-account-wrap">
                             <button type="button" class="header-action-btn training-profile-trigger" data-training-account-trigger aria-label="Training account menu" aria-expanded="false">
@@ -772,7 +770,7 @@
                             <span class="training-profile-initials"><i class="fa-regular fa-user"></i></span>
                         </a>
                     @endif
-                </div> --}}
+                </div>
             </div>
         </div>
     </div>
