@@ -32,6 +32,8 @@
             @if(request()->routeIs('admin.payments.index'))
                 @include('admin.payments._display_overrides')
             @endif
+
+            @include('admin._training_ui_overrides')
         </main>
     </div>
 </div>
