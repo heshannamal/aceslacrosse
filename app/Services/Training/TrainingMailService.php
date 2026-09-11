@@ -42,22 +42,9 @@ class TrainingMailService
 
     public function bookingCreated(EMSessionBooking $booking): void
     {
-        /*
-         * A booking created/confirmed by a paid checkout already belongs to an
-         * order and is covered by the single payment receipt email. Skipping
-         * that booking email prevents customers receiving two messages for the
-         * same checkout. Credit-only and admin/manual bookings still receive
-         * their normal confirmation email.
-         */
-        if (!empty($booking->order_id)) {
-            return;
-        }
-
-        $booking->loadMissing(['customer', 'child', 'sessionEvent']);
-        if (!$booking->customer) {
-            return;
-        }
-        $this->send($booking->customer->email, 'Training booking confirmed - ACES Lacrosse', 'emails.training.booking-confirmed', compact('booking'));
+        // Booking confirmation emails are intentionally disabled.
+        // Payment completion is confirmed by the payment receipt email only.
+        return;
     }
 
     public function bookingUpdated(EMSessionBooking $booking, ?EMSessionEvent $oldSession, EMSessionEvent $newSession): void
