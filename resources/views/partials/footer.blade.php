@@ -49,3 +49,7 @@
 
     </a>
 </footer>
+
+@if(request()->routeIs('em.customer.index'))
+    @include('pages.customer_sessions.landing._display_overrides')
+@endif
