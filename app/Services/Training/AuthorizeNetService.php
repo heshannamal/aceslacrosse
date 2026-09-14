@@ -9,6 +9,10 @@ class AuthorizeNetService
 {
     public function charge(array $card, float $amount, array $billing, string $invoiceNumber): array
     {
+        if (str_starts_with($invoiceNumber, 'AO-TR-')) {
+            $invoiceNumber = 'ACES-TR-' . substr($invoiceNumber, strlen('AO-TR-'));
+        }
+
         $loginId = trim((string) config('services.authorize_net.login_id'));
         $transactionKey = trim((string) config('services.authorize_net.transaction_key'));
 
