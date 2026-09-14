@@ -34,6 +34,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('/parents-booking/import', [ParentsBookingController::class, 'import'])->name('parents.booking.import');
             Route::get('/parents-booking/parents/check-email', [ParentsBookingController::class, 'checkParentEmail'])->name('parents.booking.parents.check-email');
             Route::get('/parents-booking/credits/options', [ChildCreditController::class, 'options'])->name('parents.booking.credits.options');
+            Route::get('/parents-booking/credits/logs', [ChildCreditController::class, 'logs'])->name('parents.booking.credits.logs');
             Route::post('/parents-booking/credits', [ChildCreditController::class, 'store'])->name('parents.booking.credits.store');
             Route::post('/parents-booking/children', [ParentsBookingController::class, 'storeChild'])->name('parents.booking.children.store');
             Route::put('/parents-booking/children/{child}', [ParentsBookingController::class, 'updateChild'])->name('parents.booking.children.update');
