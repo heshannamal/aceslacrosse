@@ -1,9 +1,9 @@
 <?php
 
+use App\Http\Controllers\AcesTrainingPortalController;
 use App\Http\Controllers\EMCustomerController;
 use App\Http\Controllers\FamilyEMCustomerController;
 use App\Http\Controllers\FamilyTrainingBookingController;
-use App\Http\Controllers\FamilyTrainingPortalController;
 use App\Http\Controllers\TrainingAuthController;
 use App\Http\Controllers\TrainingDashboardController;
 use App\Http\Controllers\TrainingProfileController;
@@ -36,20 +36,20 @@ Route::prefix('training')->name('em.customer.')->group(function () {
     Route::get('/reset-password/{token}', [EMCustomerController::class, 'resetPassword'])->middleware('throttle:20,1')->name('password.reset');
     Route::post('/reset-password', [EMCustomerController::class, 'resetPasswordSubmit'])->middleware('throttle:5,1')->name('password.update');
 
-    Route::get('/', [FamilyTrainingPortalController::class, 'index'])->name('index');
-    Route::get('/calendar-events', [FamilyTrainingPortalController::class, 'calendarEvents'])->name('calendar.events');
-    Route::get('/packages', [FamilyTrainingPortalController::class, 'packages'])->name('packages');
-    Route::get('/packages/{id}', [FamilyTrainingPortalController::class, 'packageDetails'])->name('package.details');
-    Route::post('/cart/add/{id}', [FamilyTrainingPortalController::class, 'addToCart'])->name('cart.add');
-    Route::get('/cart', [FamilyTrainingPortalController::class, 'cart'])->name('cart');
-    Route::post('/cart/{id}', [FamilyTrainingPortalController::class, 'updateCart'])->name('cart.update');
-    Route::delete('/cart/{id}', [FamilyTrainingPortalController::class, 'removeCart'])->name('cart.remove');
-    Route::get('/checkout', [FamilyTrainingPortalController::class, 'checkout'])->name('checkout');
+    Route::get('/', [AcesTrainingPortalController::class, 'index'])->name('index');
+    Route::get('/calendar-events', [AcesTrainingPortalController::class, 'calendarEvents'])->name('calendar.events');
+    Route::get('/packages', [AcesTrainingPortalController::class, 'packages'])->name('packages');
+    Route::get('/packages/{id}', [AcesTrainingPortalController::class, 'packageDetails'])->name('package.details');
+    Route::post('/cart/add/{id}', [AcesTrainingPortalController::class, 'addToCart'])->name('cart.add');
+    Route::get('/cart', [AcesTrainingPortalController::class, 'cart'])->name('cart');
+    Route::post('/cart/{id}', [AcesTrainingPortalController::class, 'updateCart'])->name('cart.update');
+    Route::delete('/cart/{id}', [AcesTrainingPortalController::class, 'removeCart'])->name('cart.remove');
+    Route::get('/checkout', [AcesTrainingPortalController::class, 'checkout'])->name('checkout');
 
     Route::middleware(['em.customer', EnsureTrainingCustomerPricing::class])->group(function () {
         Route::get('/dashboard', [TrainingDashboardController::class, 'index'])->name('dashboard');
         Route::get('/my-bookings', [TrainingDashboardController::class, 'bookings'])->name('bookings');
-        Route::post('/logout', [FamilyTrainingPortalController::class, 'logout'])->name('logout');
+        Route::post('/logout', [AcesTrainingPortalController::class, 'logout'])->name('logout');
 
         Route::post('/session/{id}/book', [FamilyTrainingBookingController::class, 'store'])->name('session.book');
         Route::post('/booking/{id}/cancel', [FamilyEMCustomerController::class, 'cancelBooking'])->name('booking.cancel');
