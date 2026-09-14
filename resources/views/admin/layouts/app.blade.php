@@ -23,6 +23,10 @@
             @if($errors->any())<div class="alert alert-danger admin-alert align-items-start"><i class="fa-solid fa-circle-exclamation mt-1"></i><div><strong>Please fix these errors:</strong><ul class="mb-0 mt-1">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div></div>@endif
             @yield('content')
 
+            @if(request()->routeIs('admin.parents.booking.index'))
+                @include('admin.parents_booking._credits_wizard')
+            @endif
+
             @if(request()->routeIs('admin.bookings.session-wise'))
                 @include('admin.bookings._detail_edit_overrides')
                 @include('admin.bookings._interaction_fix')
