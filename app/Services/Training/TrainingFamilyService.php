@@ -9,34 +9,97 @@ use Illuminate\Support\Collection;
 
 class TrainingFamilyService
 {
+    /**
+     * Return a stable key for the linked Parent 1 / Parent 2 account group.
+     *
+     * Some older/imported records may not have relational_id populated
+     * consistently, so the group is also resolved through children shared by
+     * both parent records. Using the smallest customer id gives reminders and
+     * other grouped operations one deterministic key from either parent.
+     */
     public function familyKey(?EMCustomer $customer): int
     {
-        if (!$customer) {
-            return 0;
-        }
+        $ids = $this->memberIds($customer);
 
-        return (int) ($customer->relational_id ?: $customer->id);
+        return $ids === [] ? 0 : min($ids);
     }
 
+    /**
+     * Resolve every customer record linked to this parent account.
+     *
+     * We intentionally keep inactive ids in this result because an active
+     * parent must still be able to see historical bookings, cart rows or
+     * credits that were originally stored against the other parent record.
+     * Email recipients are filtered to active customers by members().
+     */
     public function memberIds(?EMCustomer $customer): array
     {
         if (!$customer) {
             return [];
         }
 
-        $rootId = $this->familyKey($customer);
+        $ids = [(int) $customer->id];
 
-        $ids = EMCustomer::query()
-            ->where(function ($query) use ($rootId) {
-                $query->where('id', $rootId)
-                    ->orWhere('relational_id', $rootId);
-            })
-            ->where('active', 1)
-            ->pluck('id')
-            ->map(fn ($id) => (int) $id)
-            ->all();
+        // Expand both the legacy relational_id link and common-child parent
+        // links. A few passes safely resolves either direction of older data.
+        for ($pass = 0; $pass < 5; $pass++) {
+            $before = $ids;
 
-        $ids[] = (int) $customer->id;
+            $customers = EMCustomer::query()
+                ->whereIn('id', $ids)
+                ->get(['id', 'relational_id']);
+
+            $relationRoots = $customers
+                ->map(fn ($item) => (int) ($item->relational_id ?: $item->id))
+                ->merge($ids)
+                ->filter()
+                ->unique()
+                ->values()
+                ->all();
+
+            if ($relationRoots !== []) {
+                $relationIds = EMCustomer::query()
+                    ->where(function ($query) use ($relationRoots) {
+                        $query->whereIn('id', $relationRoots)
+                            ->orWhereIn('relational_id', $relationRoots);
+                    })
+                    ->pluck('id')
+                    ->map(fn ($id) => (int) $id)
+                    ->all();
+
+                $ids = array_merge($ids, $relationIds);
+            }
+
+            $ids = array_values(array_unique(array_filter(array_map('intval', $ids))));
+
+            $childIds = EMCustomerChildParent::query()
+                ->whereIn('customer_id', $ids)
+                ->pluck('child_id')
+                ->map(fn ($id) => (int) $id)
+                ->filter()
+                ->unique()
+                ->values()
+                ->all();
+
+            if ($childIds !== []) {
+                $coParentIds = EMCustomerChildParent::query()
+                    ->whereIn('child_id', $childIds)
+                    ->pluck('customer_id')
+                    ->map(fn ($id) => (int) $id)
+                    ->filter()
+                    ->all();
+
+                $ids = array_values(array_unique(array_merge($ids, $coParentIds)));
+            }
+
+            sort($ids);
+            $comparison = $before;
+            sort($comparison);
+
+            if ($ids === $comparison) {
+                break;
+            }
+        }
 
         return array_values(array_unique(array_filter($ids)));
     }
@@ -59,14 +122,14 @@ class TrainingFamilyService
 
     public function childIds(?EMCustomer $customer): array
     {
-        $familyIds = $this->memberIds($customer);
+        $parentIds = $this->memberIds($customer);
 
-        if ($familyIds === []) {
+        if ($parentIds === []) {
             return [];
         }
 
         return EMCustomerChildParent::query()
-            ->whereIn('customer_id', $familyIds)
+            ->whereIn('customer_id', $parentIds)
             ->pluck('child_id')
             ->map(fn ($id) => (int) $id)
             ->filter()
@@ -142,6 +205,7 @@ class TrainingFamilyService
     private function normalizeEmail($email): ?string
     {
         $email = strtolower(trim((string) $email));
+
         return $email !== '' && filter_var($email, FILTER_VALIDATE_EMAIL) ? $email : null;
     }
 }
