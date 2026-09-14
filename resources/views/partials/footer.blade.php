@@ -51,25 +51,25 @@
 
 @if(session()->has('em_customer_id'))
     @php
-        $sharedFamilyCartCount = 0;
+        $linkedParentCartCount = 0;
         try {
-            $sharedFamilyCustomer = \App\Models\EMCustomer::query()
+            $linkedParentCustomer = \App\Models\EMCustomer::query()
                 ->whereKey((int) session('em_customer_id'))
                 ->where('active', 1)
                 ->first();
-            if ($sharedFamilyCustomer) {
-                $sharedFamilyIds = app(\App\Services\Training\TrainingFamilyService::class)->memberIds($sharedFamilyCustomer);
-                $sharedFamilyCartCount = (int) \App\Models\EMCustomerPackageCart::query()
-                    ->whereIn('customer_id', $sharedFamilyIds)
+            if ($linkedParentCustomer) {
+                $linkedParentIds = app(\App\Services\Training\TrainingFamilyService::class)->memberIds($linkedParentCustomer);
+                $linkedParentCartCount = (int) \App\Models\EMCustomerPackageCart::query()
+                    ->whereIn('customer_id', $linkedParentIds)
                     ->sum('quantity');
             }
         } catch (\Throwable $e) {
-            $sharedFamilyCartCount = 0;
+            $linkedParentCartCount = 0;
         }
     @endphp
     <script>
     document.addEventListener('DOMContentLoaded', function () {
-        var count = {{ $sharedFamilyCartCount }};
+        var count = {{ $linkedParentCartCount }};
         document.querySelectorAll('a[aria-label="Training cart"]').forEach(function (cartLink) {
             var badge = cartLink.querySelector('.header-cart-badge');
             if (count > 0) {
@@ -83,6 +83,22 @@
                 badge.remove();
             }
         });
+
+        function cleanPendingCalendarText(root) {
+            (root || document).querySelectorAll('a.aces-family-pending').forEach(function (link) {
+                if ((link.textContent || '').trim().toUpperCase() === 'IN FAMILY CART') {
+                    link.textContent = 'IN CART';
+                }
+            });
+        }
+
+        cleanPendingCalendarText(document);
+        var calendar = document.getElementById('trainingCalendarGrid');
+        if (calendar) {
+            new MutationObserver(function () {
+                cleanPendingCalendarText(calendar);
+            }).observe(calendar, {childList:true, subtree:true, characterData:true});
+        }
     });
     </script>
 @endif
