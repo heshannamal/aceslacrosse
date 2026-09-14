@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var confirmBtn = document.getElementById('acConfirmBtn');
 
     function escapeHtml(value) {
-        return String(value == null ? '' : value).replace(/[&<>"']/g, function(char){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#039;'}[char]});
+        return String(value == null ? '' : value).replace(/[&<>"']/g, function(char){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[char]});
     }
     function showError(message){errorBox.textContent=message;errorBox.classList.remove('d-none')}
     function clearError(){errorBox.classList.add('d-none');errorBox.textContent=''}
@@ -197,7 +197,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if(!state.child)return;
         (state.child.parents||[]).forEach(function(parent){
             var card=document.createElement('button');card.type='button';card.className='ac-parent-card text-start';
-            card.innerHTML='<div class="ac-parent-top"><div><strong>'+escapeHtml(parent.name)+'</strong><small>'+escapeHtml(parent.email||'')+(parent.phone?' · '+escapeHtml(parent.phone):'')+'</small></div><div class="ac-parent-role">'+escapeHtml(parent.relationship||'Parent')+'</div></div><small class="ac-balance">'+Number(parent.family_balance||0)+' credits available</small>';
+            card.innerHTML='<div class="ac-parent-top"><div><strong>'+escapeHtml(parent.name)+'</strong><small>'+escapeHtml(parent.email||'')+(parent.phone?' · '+escapeHtml(parent.phone):'')+'</small></div><div class="ac-parent-role">'+escapeHtml(parent.relationship||'Parent')+'</div></div><small class="ac-balance">'+Number(parent.credit_balance||0)+' credits available</small>';
             card.addEventListener('click',function(){state.parent=parent;parentList.querySelectorAll('.ac-parent-card').forEach(function(el){el.classList.remove('active')});card.classList.add('active')});
             parentList.appendChild(card);
         });
@@ -223,7 +223,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function renderReview(){
-        state.note=note.value.trim();var current=Number(state.parent?.family_balance||0);
+        state.note=note.value.trim();var current=Number(state.parent?.credit_balance||0);
         document.getElementById('acReviewChild').textContent=state.child?.name||'—';
         document.getElementById('acReviewParent').textContent=(state.parent?.relationship?state.parent.relationship+': ':'')+(state.parent?.name||'—');
         document.getElementById('acReviewCredits').textContent=String(state.credits||0);
@@ -241,7 +241,7 @@ document.addEventListener('DOMContentLoaded', function () {
             var response=await fetch(storeUrl,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json','X-CSRF-TOKEN':csrf},body:JSON.stringify({child_id:state.child.id,customer_id:state.parent.id,credit_option:state.creditOption,custom_credits:state.creditOption==='custom'?state.credits:null,note:state.note||null})});
             var data=await response.json();if(!response.ok||!data.status)throw new Error(data.message||Object.values(data.errors||{})[0]?.[0]||'Could not add credits.');
             bootstrap.Modal.getOrCreateInstance(modalEl).hide();
-            var balance=data.family_balance_after??data.credit_balance_after;
+            var balance=data.credit_balance_after;
             if(window.Swal){await Swal.fire({icon:'success',title:'Credits Added',text:data.message+(balance!==undefined?' New credit balance: '+balance+'.':''),confirmButtonColor:'#611eb2'})}else alert(data.message);
             window.location.reload();
         }catch(error){showError(error.message||'Could not add credits.')}
