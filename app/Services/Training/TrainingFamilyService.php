@@ -10,12 +10,7 @@ use Illuminate\Support\Collection;
 class TrainingFamilyService
 {
     /**
-     * Return a stable key for the linked Parent 1 / Parent 2 account group.
-     *
-     * Some older/imported records may not have relational_id populated
-     * consistently, so the group is also resolved through children shared by
-     * both parent records. Using the smallest customer id gives reminders and
-     * other grouped operations one deterministic key from either parent.
+     * Return one deterministic key for a linked Parent 1 / Parent 2 pair.
      */
     public function familyKey(?EMCustomer $customer): int
     {
@@ -25,12 +20,13 @@ class TrainingFamilyService
     }
 
     /**
-     * Resolve every customer record linked to this parent account.
+     * Resolve the Parent 1 / Parent 2 records that belong to the same Training
+     * account relationship.
      *
-     * We intentionally keep inactive ids in this result because an active
-     * parent must still be able to see historical bookings, cart rows or
-     * credits that were originally stored against the other parent record.
-     * Email recipients are filtered to active customers by members().
+     * relational_id is authoritative whenever present. For older/imported
+     * records with no relational_id at all, a common-child fallback is used
+     * only when it identifies exactly one unambiguous co-parent. This avoids
+     * merging unrelated co-parents in blended-household data.
      */
     public function memberIds(?EMCustomer $customer): array
     {
@@ -38,70 +34,76 @@ class TrainingFamilyService
             return [];
         }
 
-        $ids = [(int) $customer->id];
+        $customerId = (int) $customer->id;
+        $relationalId = (int) ($customer->relational_id ?? 0);
 
-        // Expand both the legacy relational_id link and common-child parent
-        // links. A few passes safely resolves either direction of older data.
-        for ($pass = 0; $pass < 5; $pass++) {
-            $before = $ids;
-
-            $customers = EMCustomer::query()
-                ->whereIn('id', $ids)
-                ->get(['id', 'relational_id']);
-
-            $relationRoots = $customers
-                ->map(fn ($item) => (int) ($item->relational_id ?: $item->id))
-                ->merge($ids)
-                ->filter()
-                ->unique()
-                ->values()
-                ->all();
-
-            if ($relationRoots !== []) {
-                $relationIds = EMCustomer::query()
-                    ->where(function ($query) use ($relationRoots) {
-                        $query->whereIn('id', $relationRoots)
-                            ->orWhereIn('relational_id', $relationRoots);
-                    })
-                    ->pluck('id')
-                    ->map(fn ($id) => (int) $id)
-                    ->all();
-
-                $ids = array_merge($ids, $relationIds);
-            }
-
-            $ids = array_values(array_unique(array_filter(array_map('intval', $ids))));
-
-            $childIds = EMCustomerChildParent::query()
-                ->whereIn('customer_id', $ids)
-                ->pluck('child_id')
+        if ($relationalId > 0) {
+            return EMCustomer::query()
+                ->where(function ($query) use ($customerId, $relationalId) {
+                    $query->where('id', $customerId)
+                        ->orWhere('id', $relationalId)
+                        ->orWhere('relational_id', $relationalId);
+                })
+                ->pluck('id')
                 ->map(fn ($id) => (int) $id)
                 ->filter()
                 ->unique()
+                ->sort()
                 ->values()
                 ->all();
-
-            if ($childIds !== []) {
-                $coParentIds = EMCustomerChildParent::query()
-                    ->whereIn('child_id', $childIds)
-                    ->pluck('customer_id')
-                    ->map(fn ($id) => (int) $id)
-                    ->filter()
-                    ->all();
-
-                $ids = array_values(array_unique(array_merge($ids, $coParentIds)));
-            }
-
-            sort($ids);
-            $comparison = $before;
-            sort($comparison);
-
-            if ($ids === $comparison) {
-                break;
-            }
         }
 
-        return array_values(array_unique(array_filter($ids)));
+        // Parent 1 commonly has relational_id = NULL while Parent 2 points to
+        // Parent 1. Resolve that explicit reverse relationship first.
+        $explicitIds = EMCustomer::query()
+            ->where('id', $customerId)
+            ->orWhere('relational_id', $customerId)
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->filter()
+            ->unique()
+            ->sort()
+            ->values()
+            ->all();
+
+        if (count($explicitIds) > 1) {
+            return $explicitIds;
+        }
+
+        // Legacy fallback: only accept one unique co-parent found through the
+        // same child. If multiple different co-parents exist, keep the account
+        // isolated rather than risk exposing another household's data.
+        $childIds = EMCustomerChildParent::query()
+            ->where('customer_id', $customerId)
+            ->pluck('child_id')
+            ->map(fn ($id) => (int) $id)
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+
+        if ($childIds === []) {
+            return [$customerId];
+        }
+
+        $coParentIds = EMCustomerChildParent::query()
+            ->whereIn('child_id', $childIds)
+            ->where('customer_id', '!=', $customerId)
+            ->pluck('customer_id')
+            ->map(fn ($id) => (int) $id)
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+
+        if (count($coParentIds) !== 1) {
+            return [$customerId];
+        }
+
+        $ids = [$customerId, (int) $coParentIds[0]];
+        sort($ids);
+
+        return array_values(array_unique($ids));
     }
 
     public function members(?EMCustomer $customer): Collection
