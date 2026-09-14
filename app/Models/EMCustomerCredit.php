@@ -11,5 +11,15 @@ class EMCustomerCredit extends Model
     public function order(){ return $this->belongsTo(EMPackageOrder::class,'order_id'); }
     public function logs(){ return $this->hasMany(EMCustomerCreditLog::class,'credit_id'); }
     public function bookings(){ return $this->hasMany(EMSessionBooking::class,'credit_id'); }
-    public function scopeAvailable($query){ return $query->where('status','active')->where('remaining_classes','>',0)->where(function($q){$q->whereNull('valid_from')->orWhereDate('valid_from','<=',today());})->where(function($q){$q->whereNull('valid_until')->orWhereDate('valid_until','>=',today());}); }
+
+    /**
+     * ACES Training credits do not expire. A credit remains available until all
+     * of its remaining classes have been consumed.
+     */
+    public function scopeAvailable($query)
+    {
+        return $query
+            ->where('status','active')
+            ->where('remaining_classes','>',0);
+    }
 }
