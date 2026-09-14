@@ -34,7 +34,7 @@ class ChildCreditController extends Controller
                     ->values()
                     ->map(function ($relation) use ($families) {
                         $parent = $relation->customer;
-                        $familyIds = $families->memberIds($parent);
+                        $linkedParentIds = $families->memberIds($parent);
 
                         return [
                             'id' => (int) $parent->id,
@@ -42,7 +42,7 @@ class ChildCreditController extends Controller
                             'email' => $parent->email,
                             'phone' => $parent->phone,
                             'relationship' => $relation->relationship ?: ((int) $parent->parent_type === 2 ? 'Parent 2' : 'Parent 1'),
-                            'family_balance' => $this->familyBalance($familyIds),
+                            'credit_balance' => $this->creditBalance($linkedParentIds),
                         ];
                     });
 
@@ -50,6 +50,7 @@ class ChildCreditController extends Controller
                     'id' => (int) $child->id,
                     'name' => $child->full_name,
                     'team' => $child->team,
+                    'spring_team' => $child->spring_team,
                     'class_year' => $child->class_year,
                     'parents' => $parents->all(),
                 ];
@@ -169,8 +170,8 @@ class ChildCreditController extends Controller
             return response()->json(['status' => false, 'message' => 'Enter a valid credit amount.'], 422);
         }
 
-        $familyIds = $families->memberIds($parent);
-        $balanceBefore = $this->familyBalance($familyIds);
+        $linkedParentIds = $families->memberIds($parent);
+        $balanceBefore = $this->creditBalance($linkedParentIds);
         $balanceAfter = $balanceBefore + $amount;
         $note = trim((string) ($data['note'] ?? ''));
 
@@ -236,20 +237,20 @@ class ChildCreditController extends Controller
             'message' => $amount . ' credit' . ($amount === 1 ? '' : 's') . ' added successfully.',
             'credit_id' => (int) $result['credit']->id,
             'log_id' => (int) $result['additionLog']->id,
-            'family_balance_before' => $balanceBefore,
-            'family_balance_after' => $balanceAfter,
+            'credit_balance_before' => $balanceBefore,
+            'credit_balance_after' => $balanceAfter,
             'validity' => 'No Expiration — Until Used',
         ]);
     }
 
-    private function familyBalance(array $familyIds): int
+    private function creditBalance(array $linkedParentIds): int
     {
-        if ($familyIds === []) {
+        if ($linkedParentIds === []) {
             return 0;
         }
 
         return (int) EMCustomerCredit::query()
-            ->whereIn('customer_id', $familyIds)
+            ->whereIn('customer_id', $linkedParentIds)
             ->available()
             ->sum('remaining_classes');
     }
