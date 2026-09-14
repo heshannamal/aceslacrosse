@@ -22,20 +22,19 @@ class FamilyEMCustomerController extends EMCustomerController
             return parent::pay($request, $gateway, $mail);
         }
 
-        $familyIds = app(TrainingFamilyService::class)->memberIds($customer);
+        $linkedParentIds = app(TrainingFamilyService::class)->memberIds($customer);
         $beforeCreditId = (int) EMCustomerCredit::query()
-            ->whereIn('customer_id', $familyIds)
+            ->whereIn('customer_id', $linkedParentIds)
             ->max('id');
 
         /*
          * The legacy payment routine expects one customer_id. Before charging,
-         * atomically hand the shared family cart and its pending reservations to
-         * the parent who is actually paying. Order, credits and payment audit
-         * rows therefore continue through the existing proven checkout path.
+         * atomically hand all linked cart rows and pending reservations to the
+         * parent who is actually paying so the existing checkout stays intact.
          */
-        DB::transaction(function () use ($customer, $familyIds) {
+        DB::transaction(function () use ($customer, $linkedParentIds) {
             $carts = EMCustomerPackageCart::query()
-                ->whereIn('customer_id', $familyIds)
+                ->whereIn('customer_id', $linkedParentIds)
                 ->lockForUpdate()
                 ->get();
 
@@ -44,7 +43,7 @@ class FamilyEMCustomerController extends EMCustomerController
             if ($bookingIds->isNotEmpty()) {
                 EMSessionBooking::query()
                     ->whereIn('id', $bookingIds)
-                    ->whereIn('customer_id', $familyIds)
+                    ->whereIn('customer_id', $linkedParentIds)
                     ->where('status', 'pending_payment')
                     ->update(['customer_id' => $customer->id]);
             }
@@ -56,8 +55,7 @@ class FamilyEMCustomerController extends EMCustomerController
 
         $response = parent::pay($request, $gateway, $mail);
 
-        // ACES credits have no start/end validity window. Any credits created by
-        // this successful family checkout remain available until fully used.
+        // Credits bought through checkout never expire in ACES.
         EMCustomerCredit::query()
             ->where('customer_id', $customer->id)
             ->where('id', '>', $beforeCreditId)
@@ -65,6 +63,17 @@ class FamilyEMCustomerController extends EMCustomerController
                 'valid_from' => null,
                 'valid_until' => null,
             ]);
+
+        // Clean a legacy payment-finalization message retained in the base
+        // checkout path without changing its proven transaction behavior.
+        if (session()->has('error')) {
+            $message = (string) session('error');
+            session()->flash('error', str_ireplace(
+                ['Alcatraz Outlaws', 'Alcatraz'],
+                ['ACES Lacrosse', 'ACES Lacrosse'],
+                $message
+            ));
+        }
 
         return $response;
     }
@@ -76,12 +85,12 @@ class FamilyEMCustomerController extends EMCustomerController
             return parent::cancelBooking($id, $mail);
         }
 
-        $familyIds = app(TrainingFamilyService::class)->memberIds($customer);
+        $linkedParentIds = app(TrainingFamilyService::class)->memberIds($customer);
         $creditReturned = false;
 
-        $booking = DB::transaction(function () use ($familyIds, $id, &$creditReturned) {
+        $booking = DB::transaction(function () use ($linkedParentIds, $id, &$creditReturned) {
             $booking = EMSessionBooking::with(['customer', 'child', 'sessionEvent'])
-                ->whereIn('customer_id', $familyIds)
+                ->whereIn('customer_id', $linkedParentIds)
                 ->lockForUpdate()
                 ->findOrFail($id);
 
@@ -104,8 +113,8 @@ class FamilyEMCustomerController extends EMCustomerController
                         'booking_id' => $booking->id,
                         'type' => 'refund',
                         'classes' => 1,
-                        'note' => 'Family booking cancelled and 1 shared credit was returned.',
-                        'description' => 'ACES Training family cancellation credit return.',
+                        'note' => 'Booking cancelled and 1 Training credit was returned.',
+                        'description' => 'ACES Training cancellation credit return.',
                     ]);
                 }
             }
@@ -126,7 +135,7 @@ class FamilyEMCustomerController extends EMCustomerController
 
         return back()->with(
             'success',
-            'Booking cancelled' . ($creditReturned ? ' and one shared family credit was returned.' : '.')
+            'Booking cancelled' . ($creditReturned ? ' and one Training credit was returned.' : '.')
         );
     }
 
