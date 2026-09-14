@@ -95,8 +95,19 @@ class TrainingFamilyService
     {
         $recipients = [];
         $seen = [];
+        $currentCustomerId = (int) ($customer?->id ?? 0);
 
-        foreach ($this->members($customer) as $parent) {
+        $parents = $this->members($customer)
+            ->sortBy(function ($parent) use ($currentCustomerId) {
+                if ((int) $parent->id === $currentCustomerId) {
+                    return '0-' . str_pad((string) $parent->id, 10, '0', STR_PAD_LEFT);
+                }
+
+                $parentOrder = (int) ($parent->parent_type ?? 0) === 1 ? 1 : ((int) ($parent->parent_type ?? 0) === 2 ? 2 : 3);
+                return $parentOrder . '-' . str_pad((string) $parent->id, 10, '0', STR_PAD_LEFT);
+            });
+
+        foreach ($parents as $parent) {
             $email = $this->normalizeEmail($parent->email);
             if (!$email || isset($seen[$email])) {
                 continue;
