@@ -6,6 +6,7 @@ use App\Models\EMCustomer;
 use App\Models\EMPackageOrder;
 use App\Models\EMSessionBooking;
 use App\Models\EMSessionEvent;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Mail;
 
 class TrainingMailService
@@ -29,6 +30,15 @@ class TrainingMailService
         }
     }
 
+    private function sendFamily(EMCustomer $customer, string $subject, string $view, array $data = [], array $extraEmails = []): void
+    {
+        $recipients = app(TrainingFamilyService::class)->recipients($customer, $extraEmails);
+
+        foreach ($recipients as $recipient) {
+            $this->send($recipient['email'], $subject, $view, $data);
+        }
+    }
+
     public function passwordReset(EMCustomer $customer, string $url): void
     {
         $this->send($customer->email, 'Reset your ACES Lacrosse Training password', 'emails.training.password-reset', compact('customer', 'url'));
@@ -37,7 +47,15 @@ class TrainingMailService
     public function receipt(EMCustomer $customer, EMPackageOrder $order): void
     {
         $order->loadMissing(['items.package', 'paymentLogs']);
-        $this->send($customer->email, 'ACES Lacrosse Training receipt ' . $order->order_no, 'emails.training.receipt', compact('customer', 'order'));
+        $billingEmail = optional($order->paymentLogs->first())->billing_email;
+
+        $this->sendFamily(
+            $customer,
+            'ACES Lacrosse Training receipt ' . $order->order_no,
+            'emails.training.receipt',
+            compact('customer', 'order'),
+            $billingEmail ? [$billingEmail] : []
+        );
     }
 
     public function bookingCreated(EMSessionBooking $booking): void
@@ -53,7 +71,13 @@ class TrainingMailService
         if (!$booking->customer) {
             return;
         }
-        $this->send($booking->customer->email, 'Your ACES Lacrosse session was updated', 'emails.training.booking-updated', compact('booking', 'oldSession', 'newSession'));
+
+        $this->sendFamily(
+            $booking->customer,
+            'Your ACES Lacrosse session was updated',
+            'emails.training.booking-updated',
+            compact('booking', 'oldSession', 'newSession')
+        );
     }
 
     public function bookingCancelled(EMSessionBooking $booking, ?EMSessionEvent $session, bool $creditReturned): void
@@ -62,7 +86,13 @@ class TrainingMailService
         if (!$booking->customer) {
             return;
         }
-        $this->send($booking->customer->email, 'Your ACES Lacrosse booking was cancelled', 'emails.training.booking-cancelled', compact('booking', 'session', 'creditReturned'));
+
+        $this->sendFamily(
+            $booking->customer,
+            'Your ACES Lacrosse booking was cancelled',
+            'emails.training.booking-cancelled',
+            compact('booking', 'session', 'creditReturned')
+        );
     }
 
     public function reminder(EMSessionBooking $booking): void
@@ -71,6 +101,26 @@ class TrainingMailService
         if (!$booking->customer || !$booking->sessionEvent) {
             return;
         }
-        $this->send($booking->customer->email, 'ACES Training reminder - ' . ($booking->sessionEvent->training_type ?: $booking->sessionEvent->name), 'emails.training.session-reminder', compact('booking'));
+
+        $this->sendFamily(
+            $booking->customer,
+            'ACES Training reminder - ' . ($booking->sessionEvent->training_type ?: $booking->sessionEvent->name),
+            'emails.training.session-reminder',
+            compact('booking')
+        );
+    }
+
+    public function familyReminder(EMCustomer $customer, Collection $sessionItems, string $todayDisplay): void
+    {
+        if ($sessionItems->isEmpty()) {
+            return;
+        }
+
+        $this->sendFamily(
+            $customer,
+            'Reminder: Your ACES Lacrosse Training Session' . ($sessionItems->count() === 1 ? ' Is' : 's Are') . ' Today',
+            'emails.training.family-session-reminder',
+            compact('customer', 'sessionItems', 'todayDisplay')
+        );
     }
 }
