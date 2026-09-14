@@ -21,7 +21,7 @@ class TrainingMailService
             Mail::send($view, $data, function ($message) use ($to, $subject) {
                 $message->to($to)->subject($subject);
                 $bcc = trim((string) config('services.training.mail_bcc'));
-                if ($bcc !== '') {
+                if ($bcc !== '' && strcasecmp($bcc, $to) !== 0) {
                     $message->bcc($bcc);
                 }
             });
@@ -33,9 +33,32 @@ class TrainingMailService
     private function sendFamily(EMCustomer $customer, string $subject, string $view, array $data = [], array $extraEmails = []): void
     {
         $recipients = app(TrainingFamilyService::class)->recipients($customer, $extraEmails);
+        if ($recipients === []) {
+            return;
+        }
 
-        foreach ($recipients as $recipient) {
-            $this->send($recipient['email'], $subject, $view, $data);
+        $primary = array_shift($recipients);
+        $recipientEmails = collect(array_merge([$primary], $recipients))
+            ->pluck('email')
+            ->map(fn ($email) => strtolower(trim((string) $email)))
+            ->filter()
+            ->all();
+
+        try {
+            Mail::send($view, $data, function ($message) use ($primary, $recipients, $recipientEmails, $subject) {
+                $message->to($primary['email'], $primary['name'] ?: null)->subject($subject);
+
+                foreach ($recipients as $recipient) {
+                    $message->cc($recipient['email'], $recipient['name'] ?: null);
+                }
+
+                $bcc = trim((string) config('services.training.mail_bcc'));
+                if ($bcc !== '' && !in_array(strtolower($bcc), $recipientEmails, true)) {
+                    $message->bcc($bcc);
+                }
+            });
+        } catch (\Throwable $e) {
+            report($e);
         }
     }
 
