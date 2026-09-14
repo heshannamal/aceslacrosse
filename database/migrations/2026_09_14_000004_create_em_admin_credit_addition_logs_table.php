@@ -15,9 +15,9 @@ return new class extends Migration
         Schema::create('em_admin_credit_addition_logs', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('admin_user_id')->nullable();
-            $table->unsignedBigInteger('child_id');
-            $table->unsignedBigInteger('customer_id');
-            $table->unsignedBigInteger('credit_id');
+            $table->unsignedBigInteger('child_id')->nullable();
+            $table->unsignedBigInteger('customer_id')->nullable();
+            $table->unsignedBigInteger('credit_id')->nullable();
             $table->integer('credit_amount');
             $table->string('credit_option', 30)->nullable();
             $table->integer('balance_before')->default(0);
@@ -34,9 +34,9 @@ return new class extends Migration
             $table->index('created_at', 'aces_credit_add_logs_created_idx');
 
             $table->foreign('admin_user_id')->references('id')->on('users')->nullOnDelete();
-            $table->foreign('child_id')->references('id')->on('em_customer_children')->cascadeOnDelete();
-            $table->foreign('customer_id')->references('id')->on('em_customers')->cascadeOnDelete();
-            $table->foreign('credit_id')->references('id')->on('em_customer_credits')->cascadeOnDelete();
+            $table->foreign('child_id')->references('id')->on('em_customer_children')->nullOnDelete();
+            $table->foreign('customer_id')->references('id')->on('em_customers')->nullOnDelete();
+            $table->foreign('credit_id')->references('id')->on('em_customer_credits')->nullOnDelete();
         });
     }
 
