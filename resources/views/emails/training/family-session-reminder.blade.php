@@ -1,7 +1,7 @@
 @include('emails.training._header')
 <div style="font-size:11px;letter-spacing:1.7px;text-transform:uppercase;color:#611eb2;font-weight:900;">Training Reminder</div>
-<h1 style="margin:8px 0 12px;font-size:30px;line-height:36px;color:#171021;font-weight:900;">Your family’s Training {{ $sessionItems->count() === 1 ? 'session is' : 'sessions are' }} today</h1>
-<p style="margin:0 0 20px;font-size:15px;line-height:23px;color:#5f6673;">Hello ACES family, here {{ $sessionItems->count() === 1 ? 'is the session' : 'are the sessions' }} scheduled for {{ $todayDisplay }}.</p>
+<h1 style="margin:8px 0 12px;font-size:30px;line-height:36px;color:#171021;font-weight:900;">Your Training {{ $sessionItems->count() === 1 ? 'session is' : 'sessions are' }} today</h1>
+<p style="margin:0 0 20px;font-size:15px;line-height:23px;color:#5f6673;">Hello, here {{ $sessionItems->count() === 1 ? 'is the session' : 'are the sessions' }} scheduled for {{ $todayDisplay }}.</p>
 
 @foreach($sessionItems as $item)
 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin:0 0 16px;background:#faf7ff;border:1px solid #d9c3ef;border-radius:18px;">
@@ -24,5 +24,5 @@
 </table>
 @endforeach
 
-<p style="margin:24px 0 8px;"><a href="{{ route('em.customer.bookings') }}" style="display:inline-block;background:#611eb2;color:#fff;text-decoration:none;font-weight:900;padding:13px 24px;border-radius:999px;">View Family Bookings</a></p>
+<p style="margin:24px 0 8px;"><a href="{{ route('em.customer.bookings') }}" style="display:inline-block;background:#611eb2;color:#fff;text-decoration:none;font-weight:900;padding:13px 24px;border-radius:999px;">View My Bookings</a></p>
 @include('emails.training._footer')
