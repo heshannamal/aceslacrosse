@@ -1,9 +1,10 @@
 <?php
 
 use App\Http\Controllers\EMCustomerController;
+use App\Http\Controllers\FamilyEMCustomerController;
+use App\Http\Controllers\FamilyTrainingPortalController;
 use App\Http\Controllers\TrainingAuthController;
 use App\Http\Controllers\TrainingDashboardController;
-use App\Http\Controllers\TrainingPortalController;
 use App\Http\Controllers\TrainingProfileController;
 use App\Http\Controllers\TrainingRegistrationController;
 use App\Http\Middleware\EnsureTrainingCustomerPricing;
@@ -34,26 +35,26 @@ Route::prefix('training')->name('em.customer.')->group(function () {
     Route::get('/reset-password/{token}', [EMCustomerController::class, 'resetPassword'])->middleware('throttle:20,1')->name('password.reset');
     Route::post('/reset-password', [EMCustomerController::class, 'resetPasswordSubmit'])->middleware('throttle:5,1')->name('password.update');
 
-    Route::get('/', [TrainingPortalController::class, 'index'])->name('index');
-    Route::get('/calendar-events', [TrainingPortalController::class, 'calendarEvents'])->name('calendar.events');
-    Route::get('/packages', [TrainingPortalController::class, 'packages'])->name('packages');
-    Route::get('/packages/{id}', [TrainingPortalController::class, 'packageDetails'])->name('package.details');
-    Route::post('/cart/add/{id}', [TrainingPortalController::class, 'addToCart'])->name('cart.add');
-    Route::get('/cart', [TrainingPortalController::class, 'cart'])->name('cart');
-    Route::post('/cart/{id}', [TrainingPortalController::class, 'updateCart'])->name('cart.update');
-    Route::delete('/cart/{id}', [TrainingPortalController::class, 'removeCart'])->name('cart.remove');
-    Route::get('/checkout', [TrainingPortalController::class, 'checkout'])->name('checkout');
+    Route::get('/', [FamilyTrainingPortalController::class, 'index'])->name('index');
+    Route::get('/calendar-events', [FamilyTrainingPortalController::class, 'calendarEvents'])->name('calendar.events');
+    Route::get('/packages', [FamilyTrainingPortalController::class, 'packages'])->name('packages');
+    Route::get('/packages/{id}', [FamilyTrainingPortalController::class, 'packageDetails'])->name('package.details');
+    Route::post('/cart/add/{id}', [FamilyTrainingPortalController::class, 'addToCart'])->name('cart.add');
+    Route::get('/cart', [FamilyTrainingPortalController::class, 'cart'])->name('cart');
+    Route::post('/cart/{id}', [FamilyTrainingPortalController::class, 'updateCart'])->name('cart.update');
+    Route::delete('/cart/{id}', [FamilyTrainingPortalController::class, 'removeCart'])->name('cart.remove');
+    Route::get('/checkout', [FamilyTrainingPortalController::class, 'checkout'])->name('checkout');
 
     Route::middleware(['em.customer', EnsureTrainingCustomerPricing::class])->group(function () {
         Route::get('/dashboard', [TrainingDashboardController::class, 'index'])->name('dashboard');
         Route::get('/my-bookings', [TrainingDashboardController::class, 'bookings'])->name('bookings');
-        Route::post('/logout', [TrainingPortalController::class, 'logout'])->name('logout');
+        Route::post('/logout', [FamilyTrainingPortalController::class, 'logout'])->name('logout');
 
-        Route::post('/session/{id}/book', [TrainingPortalController::class, 'bookSession'])->name('session.book');
-        Route::post('/booking/{id}/cancel', [EMCustomerController::class, 'cancelBooking'])->name('booking.cancel');
+        Route::post('/session/{id}/book', [FamilyTrainingPortalController::class, 'bookSession'])->name('session.book');
+        Route::post('/booking/{id}/cancel', [FamilyEMCustomerController::class, 'cancelBooking'])->name('booking.cancel');
 
-        Route::post('/checkout/pay', [EMCustomerController::class, 'pay'])->name('pay');
-        Route::get('/payment-success/{orderId}', [EMCustomerController::class, 'paymentSuccess'])->name('payment.success');
+        Route::post('/checkout/pay', [FamilyEMCustomerController::class, 'pay'])->name('pay');
+        Route::get('/payment-success/{orderId}', [FamilyEMCustomerController::class, 'paymentSuccess'])->name('payment.success');
 
         Route::get('/profile', [TrainingProfileController::class, 'index'])->name('profile');
         Route::post('/profile', [TrainingProfileController::class, 'update'])->name('profile.update');
