@@ -6,6 +6,7 @@ use App\Models\EMCustomer;
 use App\Models\EMCustomerCredit;
 use App\Models\EMCustomerCreditLog;
 use App\Models\EMCustomerPackageCart;
+use App\Models\EMPackageOrder;
 use App\Models\EMSessionBooking;
 use App\Services\Training\AuthorizeNetService;
 use App\Services\Training\TrainingFamilyService;
@@ -76,6 +77,21 @@ class FamilyEMCustomerController extends EMCustomerController
         }
 
         return $response;
+    }
+
+    public function paymentSuccess($orderId)
+    {
+        $customer = $this->currentFamilyCustomer();
+        if (!$customer) {
+            return parent::paymentSuccess($orderId);
+        }
+
+        $linkedParentIds = app(TrainingFamilyService::class)->memberIds($customer);
+        $order = EMPackageOrder::with(['items.package', 'paymentLogs'])
+            ->whereIn('customer_id', $linkedParentIds)
+            ->findOrFail($orderId);
+
+        return view('pages.customer_sessions.payment-success', compact('customer', 'order'));
     }
 
     public function cancelBooking($id, TrainingMailService $mail)
