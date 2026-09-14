@@ -23,6 +23,9 @@ class FamilyEMCustomerController extends EMCustomerController
         }
 
         $familyIds = app(TrainingFamilyService::class)->memberIds($customer);
+        $beforeCreditId = (int) EMCustomerCredit::query()
+            ->whereIn('customer_id', $familyIds)
+            ->max('id');
 
         /*
          * The legacy payment routine expects one customer_id. Before charging,
@@ -51,7 +54,19 @@ class FamilyEMCustomerController extends EMCustomerController
                 ->update(['customer_id' => $customer->id]);
         });
 
-        return parent::pay($request, $gateway, $mail);
+        $response = parent::pay($request, $gateway, $mail);
+
+        // ACES credits have no start/end validity window. Any credits created by
+        // this successful family checkout remain available until fully used.
+        EMCustomerCredit::query()
+            ->where('customer_id', $customer->id)
+            ->where('id', '>', $beforeCreditId)
+            ->update([
+                'valid_from' => null,
+                'valid_until' => null,
+            ]);
+
+        return $response;
     }
 
     public function cancelBooking($id, TrainingMailService $mail)
