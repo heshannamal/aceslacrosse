@@ -254,14 +254,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 var action = eventNode.querySelector('a');
                 if (!action || !match.family_status) return;
 
-                action.removeAttribute('data-calendar-book');
-                action.classList.remove('aces-family-booked', 'aces-family-pending');
-
-                if (match.family_status === 'booked') {
+                if (match.family_status === 'booked' && !action.classList.contains('aces-family-booked')) {
+                    action.removeAttribute('data-calendar-book');
+                    action.classList.remove('aces-family-pending');
                     action.textContent = 'BOOKED';
                     action.href = bookingsUrl;
                     action.classList.add('aces-family-booked');
-                } else if (match.family_status === 'pending') {
+                } else if (match.family_status === 'pending' && !action.classList.contains('aces-family-pending')) {
+                    action.removeAttribute('data-calendar-book');
+                    action.classList.remove('aces-family-booked');
                     action.textContent = 'IN FAMILY CART';
                     action.href = cartUrl;
                     action.classList.add('aces-family-pending');
