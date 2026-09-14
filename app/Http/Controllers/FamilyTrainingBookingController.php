@@ -78,7 +78,7 @@ class FamilyTrainingBookingController extends Controller
                     ->exists();
 
                 if ($pending) {
-                    throw new RuntimeException('This player/session is already in your shared family cart. Either parent can open the cart, remove it, or complete checkout.');
+                    throw new RuntimeException('This player/session is already in the cart. You can remove it or complete checkout.');
                 }
 
                 $duplicate = EMSessionBooking::query()
@@ -94,7 +94,7 @@ class FamilyTrainingBookingController extends Controller
                     throw new RuntimeException('This player is already booked for this session.');
                 }
 
-                // pending_payment belongs to the shared family cart and does not
+                // pending_payment belongs to the linked cart and does not
                 // reserve capacity until the booking is actually confirmed.
                 $confirmedCount = EMSessionBooking::query()
                     ->where('session_event_id', $session->id)
@@ -116,7 +116,7 @@ class FamilyTrainingBookingController extends Controller
                         ->first();
 
                     if (!$credit) {
-                        throw new RuntimeException('Your family does not have active credits. Select a package to continue.');
+                        throw new RuntimeException('You do not have active Training credits. Select a package to continue.');
                     }
 
                     $booking = $this->createBooking($customer, $child, $session, [
@@ -139,12 +139,12 @@ class FamilyTrainingBookingController extends Controller
                         'booking_id' => $booking->id,
                         'type' => 'used',
                         'classes' => 1,
-                        'note' => 'Shared family credit used by customer #' . $customer->id . ' for ' . ($session->training_type ?: $session->name),
-                        'description' => 'One ACES Training family credit used.',
+                        'note' => 'Training credit used by customer #' . $customer->id . ' for ' . ($session->training_type ?: $session->name),
+                        'description' => 'One ACES Training credit used.',
                     ]);
 
                     return [
-                        'message' => 'Session booked successfully using 1 shared family credit.',
+                        'message' => 'Session booked successfully using 1 Training credit.',
                         'redirect' => route('em.customer.bookings'),
                     ];
                 }
@@ -183,7 +183,7 @@ class FamilyTrainingBookingController extends Controller
                 $booking->save();
 
                 return [
-                    'message' => 'Booking reserved in your shared family cart. Either parent can complete checkout.',
+                    'message' => 'Booking reserved in your cart. You can complete checkout now.',
                     'redirect' => route('em.customer.cart'),
                 ];
             });
@@ -212,7 +212,7 @@ class FamilyTrainingBookingController extends Controller
                 ->exists();
 
             if (!$linked) {
-                throw new RuntimeException('Selected player is not connected to your family Training account.');
+                throw new RuntimeException('Selected player is not connected to your Training account.');
             }
 
             $child = EMCustomerChild::query()->whereKey($childId)->where('is_active', 1)->first();
