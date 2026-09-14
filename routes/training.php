@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\EMCustomerController;
 use App\Http\Controllers\FamilyEMCustomerController;
+use App\Http\Controllers\FamilyTrainingBookingController;
 use App\Http\Controllers\FamilyTrainingPortalController;
 use App\Http\Controllers\TrainingAuthController;
 use App\Http\Controllers\TrainingDashboardController;
@@ -50,7 +51,7 @@ Route::prefix('training')->name('em.customer.')->group(function () {
         Route::get('/my-bookings', [TrainingDashboardController::class, 'bookings'])->name('bookings');
         Route::post('/logout', [FamilyTrainingPortalController::class, 'logout'])->name('logout');
 
-        Route::post('/session/{id}/book', [FamilyTrainingPortalController::class, 'bookSession'])->name('session.book');
+        Route::post('/session/{id}/book', [FamilyTrainingBookingController::class, 'store'])->name('session.book');
         Route::post('/booking/{id}/cancel', [FamilyEMCustomerController::class, 'cancelBooking'])->name('booking.cancel');
 
         Route::post('/checkout/pay', [FamilyEMCustomerController::class, 'pay'])->name('pay');
