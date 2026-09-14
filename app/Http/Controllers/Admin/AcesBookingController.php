@@ -5,9 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Models\EMSessionBooking;
 use App\Services\Training\TrainingFamilyService;
 use App\Services\Training\TrainingMailService;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 
 class AcesBookingController extends BookingController
 {
@@ -44,7 +43,7 @@ class AcesBookingController extends BookingController
                 $payload['message'] = $this->cleanText((string) $payload['message']);
             }
 
-            return response()->json($payload, $response->getStatusCode(), $response->headers->all());
+            return response()->json($payload, $response->getStatusCode());
         }
 
         foreach (['success', 'error'] as $key) {
@@ -59,8 +58,8 @@ class AcesBookingController extends BookingController
     private function cleanText(string $message): string
     {
         return str_ireplace([
-            'shared family credit',
             'shared family Training credit',
+            'shared family credit',
             'family credit',
             'This family has no active Training credits.',
             'linked to this family',
