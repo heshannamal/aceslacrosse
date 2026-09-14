@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\EMCustomer;
 use App\Models\EMCustomerChild;
 use App\Models\EMCustomerChildParent;
+use App\Models\EMCustomerPackageCart;
 use App\Models\EMSessionBooking;
+use App\Services\Training\TrainingFamilyService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -15,12 +17,16 @@ use Illuminate\Validation\Rule;
 
 class TrainingProfileController extends Controller
 {
-    public function index()
+    public function index(TrainingFamilyService $families)
     {
         $customer = $this->customer();
-        $children = $customer->activeChildren()->orderBy('first_name')->orderBy('last_name')->get();
+        $familyIds = $families->memberIds($customer);
+        $children = $families->children($customer);
+        $trainingCartCount = (int) EMCustomerPackageCart::query()
+            ->whereIn('customer_id', $familyIds)
+            ->sum('quantity');
 
-        return view('pages.customer_sessions.portal.profile', compact('customer', 'children'));
+        return view('pages.customer_sessions.portal.profile', compact('customer', 'children', 'trainingCartCount'));
     }
 
     public function update(Request $request)
@@ -72,8 +78,8 @@ class TrainingProfileController extends Controller
             EMCustomerChildParent::create([
                 'customer_id' => $customer->id,
                 'child_id' => $child->id,
-                'relationship' => 'Parent 1',
-                'is_primary' => 1,
+                'relationship' => (int) $customer->parent_type === 2 ? 'Parent 2' : 'Parent 1',
+                'is_primary' => (int) $customer->parent_type === 1 ? 1 : 0,
                 'can_book' => 1,
                 'can_pay' => 1,
                 'can_pickup' => 0,
@@ -81,25 +87,26 @@ class TrainingProfileController extends Controller
             ]);
         });
 
-        return back()->with('success', 'Player added.');
+        return back()->with('success', 'Player added to the shared family account.');
     }
 
-    public function updateChild(Request $request, EMCustomerChild $child)
+    public function updateChild(Request $request, EMCustomerChild $child, TrainingFamilyService $families)
     {
         $customer = $this->customer();
-        $this->ensureChildOwnership($customer, $child);
+        $this->ensureChildOwnership($customer, $child, $families);
         $child->update($this->childData($request));
 
         return back()->with('success', 'Player updated.');
     }
 
-    public function deleteChild(EMCustomerChild $child)
+    public function deleteChild(EMCustomerChild $child, TrainingFamilyService $families)
     {
         $customer = $this->customer();
-        $this->ensureChildOwnership($customer, $child);
+        $this->ensureChildOwnership($customer, $child, $families);
+        $familyIds = $families->memberIds($customer);
 
         $hasUpcoming = EMSessionBooking::query()
-            ->where('customer_id', $customer->id)
+            ->whereIn('customer_id', $familyIds)
             ->where(function ($query) use ($child) {
                 $query->where('child_id', $child->id)->orWhere('customer_child_id', $child->id);
             })
@@ -108,7 +115,7 @@ class TrainingProfileController extends Controller
             ->exists();
 
         if ($hasUpcoming) {
-            return back()->with('error', 'This player has an active upcoming booking and cannot be removed yet.');
+            return back()->with('error', 'This player has an active family booking and cannot be removed yet.');
         }
 
         $child->is_active = 0;
@@ -138,12 +145,13 @@ class TrainingProfileController extends Controller
         return $data;
     }
 
-    private function ensureChildOwnership(EMCustomer $customer, EMCustomerChild $child): void
+    private function ensureChildOwnership(EMCustomer $customer, EMCustomerChild $child, TrainingFamilyService $families): void
     {
+        $familyIds = $families->memberIds($customer);
         abort_unless(
-            EMCustomerChildParent::where('customer_id', $customer->id)->where('child_id', $child->id)->exists(),
+            EMCustomerChildParent::whereIn('customer_id', $familyIds)->where('child_id', $child->id)->exists(),
             403,
-            'This player is not linked to your Training account.'
+            'This player is not linked to your family Training account.'
         );
     }
 
