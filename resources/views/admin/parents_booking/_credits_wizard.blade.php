@@ -11,8 +11,9 @@
     .ac-step-panel{display:none}.ac-step-panel.active{display:block}
     .ac-kicker{font-size:11px;font-weight:900;letter-spacing:.13em;color:var(--ac);text-transform:uppercase}
     .ac-title{font-size:22px;font-weight:900;color:var(--ink);margin:5px 0 5px}.ac-sub{color:#697386;font-size:13px;margin-bottom:16px}
-    .ac-select{height:48px;border:1px solid #d8d4de;border-radius:13px;background:#fff;padding:0 13px;width:100%;font-weight:700;color:#24202b}
-    .ac-select:focus,.ac-note:focus,.ac-custom:focus{outline:0;border-color:var(--ac);box-shadow:0 0 0 3px rgba(97,30,178,.1)}
+    .ac-select,.ac-search{height:48px;border:1px solid #d8d4de;border-radius:13px;background:#fff;padding:0 13px;width:100%;font-weight:700;color:#24202b}
+    .ac-search{margin-bottom:10px}
+    .ac-select:focus,.ac-search:focus,.ac-note:focus,.ac-custom:focus{outline:0;border-color:var(--ac);box-shadow:0 0 0 3px rgba(97,30,178,.1)}
     .ac-parent-list{display:grid;gap:10px}.ac-parent-card,.ac-credit-card{border:1px solid #ddd8e3;border-radius:15px;background:#fff;padding:14px;cursor:pointer;transition:.18s ease}
     .ac-parent-card:hover,.ac-credit-card:hover{border-color:#b58bdc}.ac-parent-card.active,.ac-credit-card.active{border-color:var(--ac);background:var(--ac-soft);box-shadow:0 0 0 3px rgba(97,30,178,.08)}
     .ac-parent-top{display:flex;justify-content:space-between;gap:12px}.ac-parent-card strong{color:var(--ink)}.ac-parent-card small{display:block;color:#6b7280;margin-top:3px}.ac-parent-role{font-size:10px;font-weight:900;color:var(--ac);text-transform:uppercase;letter-spacing:.08em}
@@ -43,7 +44,8 @@
                 <div id="acCreditsError" class="alert alert-danger d-none"></div>
 
                 <div class="ac-step-panel" data-ac-panel="1">
-                    <div class="ac-kicker">Step 1 of 4</div><div class="ac-title">Select an active child</div><div class="ac-sub">Choose the player whose family should receive the shared Training credits.</div>
+                    <div class="ac-kicker">Step 1 of 4</div><div class="ac-title">Select an active child</div><div class="ac-sub">Search and select the player who should receive the Training credits.</div>
+                    <input id="acChildSearch" type="search" class="ac-search" autocomplete="off" placeholder="Search child, team, or grade...">
                     <select id="acChildSelect" class="ac-select"><option value="">Select player...</option></select>
                     <div id="acChildMeta" class="small text-muted fw-semibold mt-2"></div>
                 </div>
@@ -55,7 +57,7 @@
 
                 <div class="ac-step-panel" data-ac-panel="3">
                     <div class="ac-kicker">Step 3 of 4</div><div class="ac-title">Choose credits</div><div class="ac-sub">Select a preset amount or enter a custom number. Credits remain available until they are used.</div>
-                    <div class="ac-credit-grid">
+                    <div class="ac-credit-grid mb-3">
                         <button type="button" class="ac-credit-card" data-ac-credit="1"><strong>1</strong><span>CREDIT</span></button>
                         <button type="button" class="ac-credit-card" data-ac-credit="6"><strong>6</strong><span>CREDITS</span></button>
                         <button type="button" class="ac-credit-card" data-ac-credit="12"><strong>12</strong><span>CREDITS</span></button>
@@ -67,7 +69,7 @@
                 </div>
 
                 <div class="ac-step-panel" data-ac-panel="4">
-                    <div class="ac-kicker">Step 4 of 4</div><div class="ac-title">Review and confirm</div><div class="ac-sub">Confirm the family credit adjustment before saving.</div>
+                    <div class="ac-kicker">Step 4 of 4</div><div class="ac-title">Review and confirm</div><div class="ac-sub">Confirm the credit adjustment before saving.</div>
                     <div class="ac-review">
                         <div class="ac-review-row"><span>Child</span><strong id="acReviewChild">—</strong></div>
                         <div class="ac-review-row"><span>Parent</span><strong id="acReviewParent">—</strong></div>
@@ -117,7 +119,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     var loading = document.getElementById('acCreditsLoading');
     var errorBox = document.getElementById('acCreditsError');
+    var childSearch = document.getElementById('acChildSearch');
     var childSelect = document.getElementById('acChildSelect');
+    var childMeta = document.getElementById('acChildMeta');
     var parentList = document.getElementById('acParentList');
     var customWrap = document.getElementById('acCustomWrap');
     var customCredits = document.getElementById('acCustomCredits');
@@ -126,10 +130,10 @@ document.addEventListener('DOMContentLoaded', function () {
     var nextBtn = document.getElementById('acNextBtn');
     var confirmBtn = document.getElementById('acConfirmBtn');
 
-    function showError(message) {
-        errorBox.textContent = message;
-        errorBox.classList.remove('d-none');
+    function escapeHtml(value) {
+        return String(value == null ? '' : value).replace(/[&<>"']/g, function(char){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[char]});
     }
+    function showError(message) { errorBox.textContent = message; errorBox.classList.remove('d-none'); }
     function clearError() { errorBox.classList.add('d-none'); errorBox.textContent = ''; }
 
     function setStep(number) {
@@ -149,17 +153,46 @@ document.addEventListener('DOMContentLoaded', function () {
         if (step === 4) renderReview();
     }
 
+    function renderChildOptions(query) {
+        var needle = String(query || '').trim().toLowerCase();
+        var matches = children.filter(function (child) {
+            if (!needle) return true;
+            return [child.name, child.team, child.class_year]
+                .filter(Boolean)
+                .join(' ')
+                .toLowerCase()
+                .includes(needle);
+        });
+
+        var selectedId = state.child ? String(state.child.id) : '';
+        childSelect.innerHTML = '<option value="">Select player...</option>' + matches.map(function(child){
+            var meta = [child.class_year, child.team].filter(Boolean).join(' · ');
+            return '<option value="'+child.id+'">'+escapeHtml(child.name)+(meta ? ' — '+escapeHtml(meta) : '')+'</option>';
+        }).join('');
+
+        if (!matches.length) {
+            childSelect.innerHTML += '<option value="" disabled>No matching children found</option>';
+        }
+
+        if (selectedId && matches.some(function(child){ return String(child.id) === selectedId; })) {
+            childSelect.value = selectedId;
+        }
+    }
+
     function resetWizard() {
         step = 1;
         state = {child:null,parent:null,creditOption:null,credits:0,note:''};
+        childSearch.value = '';
+        childMeta.textContent = '';
+        renderChildOptions('');
         childSelect.value = '';
         parentList.innerHTML = '';
         customCredits.value = '';
         note.value = '';
         customWrap.style.display = 'none';
         document.querySelectorAll('#acesAddCreditsModal .ac-credit-card').forEach(function (card) { card.classList.remove('active'); });
-        document.getElementById('acChildMeta').textContent = '';
         setStep(1);
+        window.setTimeout(function(){ childSearch.focus(); }, 200);
     }
 
     async function loadOptions() {
@@ -171,10 +204,6 @@ document.addEventListener('DOMContentLoaded', function () {
             var data = await response.json();
             if (!response.ok || !data.status) throw new Error(data.message || 'Could not load active members.');
             children = data.children || [];
-            childSelect.innerHTML = '<option value="">Select player...</option>' + children.map(function(child){
-                var meta = [child.class_year, child.team].filter(Boolean).join(' · ');
-                return '<option value="'+child.id+'">'+escapeHtml(child.name)+(meta ? ' — '+escapeHtml(meta) : '')+'</option>';
-            }).join('');
             loading.classList.add('d-none');
             resetWizard();
         } catch (error) {
@@ -183,16 +212,18 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    function escapeHtml(value) {
-        return String(value == null ? '' : value).replace(/[&<>"']/g, function(char){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[char]});
-    }
+    childSearch.addEventListener('input', function () {
+        state.child = null;
+        state.parent = null;
+        childMeta.textContent = '';
+        renderChildOptions(childSearch.value);
+        childSelect.value = '';
+    });
 
     childSelect.addEventListener('change', function () {
         state.child = children.find(function(child){ return String(child.id) === String(childSelect.value); }) || null;
         state.parent = null;
-        if (state.child) {
-            document.getElementById('acChildMeta').textContent = [state.child.class_year, state.child.team].filter(Boolean).join(' · ');
-        } else document.getElementById('acChildMeta').textContent = '';
+        childMeta.textContent = state.child ? [state.child.class_year, state.child.team].filter(Boolean).join(' · ') : '';
     });
 
     function renderParents() {
