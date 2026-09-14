@@ -52,10 +52,7 @@ class TrainingEmailTestController extends Controller
         } catch (Throwable $e) {
             report($e);
 
-            return back()->with(
-                'error',
-                'Test email failed: ' . $e->getMessage()
-            );
+            return back()->with('error', 'Test email failed: ' . $e->getMessage());
         }
 
         return back()->with(
@@ -78,28 +75,28 @@ class TrainingEmailTestController extends Controller
                 'name' => 'Payment Receipt',
                 'subject' => 'ACES Lacrosse Training payment receipt TEST01',
                 'view' => 'emails.training.receipt',
-                'trigger' => 'A Training package/order payment completes successfully.',
+                'trigger' => 'A Training package/order payment completes successfully. Linked Parent 1 / Parent 2 receive the same family receipt copy.',
                 'icon' => 'fa-receipt',
             ],
             'booking-updated' => [
                 'name' => 'Booking Updated',
                 'subject' => 'Your ACES Lacrosse session was updated',
                 'view' => 'emails.training.booking-updated',
-                'trigger' => 'An admin moves an existing Training booking to another session.',
+                'trigger' => 'An admin moves an existing Training booking to another session. Both linked parents are notified.',
                 'icon' => 'fa-calendar-days',
             ],
             'booking-cancelled' => [
                 'name' => 'Booking Cancelled',
                 'subject' => 'Your ACES Lacrosse booking was cancelled',
                 'view' => 'emails.training.booking-cancelled',
-                'trigger' => 'A Training booking is cancelled.',
+                'trigger' => 'A Training booking is cancelled/deleted. Both linked parents are notified.',
                 'icon' => 'fa-calendar-xmark',
             ],
             'session-reminder' => [
-                'name' => 'Session Reminder',
-                'subject' => 'ACES Training reminder - Stickwork',
-                'view' => 'emails.training.session-reminder',
-                'trigger' => 'A reminder is sent before an upcoming Training session.',
+                'name' => 'Family Session Reminder',
+                'subject' => 'Reminder: Your ACES Lacrosse Training Sessions Are Today',
+                'view' => 'emails.training.family-session-reminder',
+                'trigger' => 'Today’s Parent 1 + Parent 2 bookings are combined into one family reminder and sent to both linked parents.',
                 'icon' => 'fa-bell',
             ],
         ];
@@ -245,7 +242,6 @@ class TrainingEmailTestController extends Controller
             ]);
 
             $booking->setRelation('sessionEvent', $newSession);
-
             return compact('booking', 'oldSession', 'newSession');
         }
 
@@ -254,6 +250,52 @@ class TrainingEmailTestController extends Controller
                 'booking' => $booking,
                 'session' => $session,
                 'creditReturned' => true,
+            ];
+        }
+
+        if ($type === 'session-reminder') {
+            $secondSession = new EMSessionEvent([
+                'name' => 'Fieldwork',
+                'training_type' => 'Fieldwork',
+                'street_address' => '50 Nova Albion Way',
+                'city' => 'San Rafael',
+                'location' => 'San Rafael, CA',
+                'instructor' => 'ACES Coach',
+                'event_date' => $sessionDate,
+                'start_time' => '18:30:00',
+                'end_time' => '19:45:00',
+                'what_to_bring' => 'Stick, Goggles, Cleats, Water',
+            ]);
+
+            $sessionItems = collect([
+                [
+                    'booking' => $booking,
+                    'session' => $session,
+                    'child_name' => 'Test Player',
+                    'session_name' => 'Stickwork',
+                    'date' => $sessionDate->format('M d, Y'),
+                    'time' => '5:00 PM - 6:15 PM',
+                    'location' => '395 Doherty Dr, San Rafael',
+                    'instructor' => 'Prasad',
+                    'what_to_bring' => $session->what_to_bring,
+                ],
+                [
+                    'booking' => $booking,
+                    'session' => $secondSession,
+                    'child_name' => 'Second Family Player',
+                    'session_name' => 'Fieldwork',
+                    'date' => $sessionDate->format('M d, Y'),
+                    'time' => '6:30 PM - 7:45 PM',
+                    'location' => '50 Nova Albion Way, San Rafael',
+                    'instructor' => 'ACES Coach',
+                    'what_to_bring' => $secondSession->what_to_bring,
+                ],
+            ]);
+
+            return [
+                'customer' => $customer,
+                'sessionItems' => $sessionItems,
+                'todayDisplay' => $sessionDate->format('M d, Y'),
             ];
         }
 
