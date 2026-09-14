@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\EMSessionBooking;
 use App\Models\EMSessionEvent;
+use App\Services\Training\TrainingMailService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -75,8 +76,6 @@ class SessionController extends Controller
                 ->groupBy('session_event_id')
                 ->pluck('bookings_count', 'session_event_id');
 
-            // Keep pending checkout items visible for reference only. They are
-            // cart items and do not consume session capacity.
             $pendingReservationCounts = EMSessionBooking::query()
                 ->whereIn('session_event_id', $sessionIds)
                 ->where('status', 'pending_payment')
@@ -92,18 +91,13 @@ class SessionController extends Controller
             $bookedCount = (int) ($bookingCounts[$session->id] ?? 0);
             $pendingReservations = (int) ($pendingReservationCounts[$session->id] ?? 0);
 
-            // Availability is based only on confirmed bookings.
             $session->bookings_count = $bookedCount;
             $session->pending_reservations_count = $pendingReservations;
             $session->capacity_used_count = $bookedCount;
             $session->is_full = $capacity > 0 && $bookedCount >= $capacity;
 
             try {
-                $sessionDate = \Carbon\Carbon::parse(
-                    $session->event_date,
-                    'America/Los_Angeles'
-                )->format('Y-m-d');
-
+                $sessionDate = \Carbon\Carbon::parse($session->event_date, 'America/Los_Angeles')->format('Y-m-d');
                 if (!empty($session->end_time)) {
                     $sessionTime = \Carbon\Carbon::parse($session->end_time)->format('H:i:s');
                 } elseif (!empty($session->start_time)) {
@@ -112,11 +106,7 @@ class SessionController extends Controller
                     $sessionTime = '23:59:59';
                 }
 
-                $sessionEndAt = \Carbon\Carbon::parse(
-                    $sessionDate . ' ' . $sessionTime,
-                    'America/Los_Angeles'
-                );
-
+                $sessionEndAt = \Carbon\Carbon::parse($sessionDate . ' ' . $sessionTime, 'America/Los_Angeles');
                 $session->is_past = $sessionEndAt->lt($pacificNow);
                 $session->session_sort_timestamp = $sessionEndAt->timestamp;
             } catch (\Throwable $e) {
@@ -128,29 +118,17 @@ class SessionController extends Controller
         });
 
         if ($status === 'upcoming') {
-            $sessions = $sessions->filter(function ($session) {
-                return empty($session->is_past);
-            })->values();
+            $sessions = $sessions->filter(fn ($session) => empty($session->is_past))->values();
         } elseif ($status === 'past') {
-            $sessions = $sessions->filter(function ($session) {
-                return !empty($session->is_past);
-            })->values();
+            $sessions = $sessions->filter(fn ($session) => !empty($session->is_past))->values();
         }
 
-        if ($status === 'past') {
-            $sessions = $sessions->sortByDesc('session_sort_timestamp')->values();
-        } else {
-            $sessions = $sessions->sortBy('session_sort_timestamp')->values();
-        }
+        $sessions = $status === 'past'
+            ? $sessions->sortByDesc('session_sort_timestamp')->values()
+            : $sessions->sortBy('session_sort_timestamp')->values();
 
         return view('admin.schedules.sessions-index', compact(
-            'sessions',
-            'trainingTypes',
-            'search',
-            'type',
-            'dateFrom',
-            'dateTo',
-            'status'
+            'sessions', 'trainingTypes', 'search', 'type', 'dateFrom', 'dateTo', 'status'
         ));
     }
 
@@ -177,8 +155,12 @@ class SessionController extends Controller
         return view('admin.schedules.session-form', compact('session'));
     }
 
-    public function update(Request $request, EMSessionEvent $session)
+    public function update(Request $request, EMSessionEvent $session, TrainingMailService $mail)
     {
+        $oldSession = $session->replicate();
+        $oldSession->id = $session->id;
+        $oldSession->exists = true;
+
         $data = $this->prepareSessionData(
             $request,
             $this->validateSession($request),
@@ -186,10 +168,25 @@ class SessionController extends Controller
         );
 
         $session->update($data);
+        $session->refresh();
+
+        $affectedBookings = EMSessionBooking::with(['customer', 'child'])
+            ->where('session_event_id', $session->id)
+            ->whereIn('status', self::CONFIRMED_BOOKING_STATUSES)
+            ->get();
+
+        foreach ($affectedBookings as $booking) {
+            $mail->bookingUpdated($booking, $oldSession, $session);
+        }
+
+        $message = 'Session updated successfully.';
+        if ($affectedBookings->isNotEmpty()) {
+            $message .= ' Linked families were notified of the session change.';
+        }
 
         return redirect()
             ->route('admin.em.sessions.index')
-            ->with('success', 'Session updated successfully.');
+            ->with('success', $message);
     }
 
     public function destroy(EMSessionEvent $session)
@@ -225,15 +222,10 @@ class SessionController extends Controller
         ]);
     }
 
-    private function prepareSessionData(
-        Request $request,
-        array $data,
-        ?EMSessionEvent $session = null
-    ): array {
+    private function prepareSessionData(Request $request, array $data, ?EMSessionEvent $session = null): array
+    {
         $instructors = collect($request->input('instructors', []))
-            ->map(function ($name) {
-                return trim((string) $name);
-            })
+            ->map(fn ($name) => trim((string) $name))
             ->filter()
             ->values()
             ->all();
