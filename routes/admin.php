@@ -1,8 +1,8 @@
 <?php
 
+use App\Http\Controllers\Admin\AcesBookingController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AuthController;
-use App\Http\Controllers\Admin\BookingController;
 use App\Http\Controllers\Admin\ChildCreditController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\PackageController;
@@ -39,11 +39,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('/parents-booking/children', [ParentsBookingController::class, 'storeChild'])->name('parents.booking.children.store');
             Route::put('/parents-booking/children/{child}', [ParentsBookingController::class, 'updateChild'])->name('parents.booking.children.update');
             Route::delete('/parents-booking/children/{child}', [ParentsBookingController::class, 'deleteChild'])->name('parents.booking.children.delete');
-            Route::get('/bookings/session-wise', [BookingController::class, 'index'])->name('bookings.session-wise');
-            Route::post('/bookings/session-wise/manual/validate', [BookingController::class, 'validateManual'])->name('bookings.session-wise.manual.validate');
-            Route::post('/bookings/session-wise/manual/store', [BookingController::class, 'store'])->name('bookings.session-wise.manual.store');
-            Route::put('/bookings/session-wise/{booking}/session', [BookingController::class, 'updateSession'])->name('bookings.session-wise.update-session');
-            Route::delete('/bookings/session-wise/{booking}', [BookingController::class, 'destroy'])->name('bookings.session-wise.destroy');
+            Route::get('/bookings/session-wise', [AcesBookingController::class, 'index'])->name('bookings.session-wise');
+            Route::post('/bookings/session-wise/manual/validate', [AcesBookingController::class, 'validateManual'])->name('bookings.session-wise.manual.validate');
+            Route::post('/bookings/session-wise/manual/store', [AcesBookingController::class, 'store'])->name('bookings.session-wise.manual.store');
+            Route::put('/bookings/session-wise/{booking}/session', [AcesBookingController::class, 'updateSession'])->name('bookings.session-wise.update-session');
+            Route::delete('/bookings/session-wise/{booking}', [AcesBookingController::class, 'destroy'])->name('bookings.session-wise.destroy');
             Route::get('/schedules', fn() => redirect()->route('admin.em.packages.index'))->name('schedules.index');
             Route::get('/schedules/packages', [PackageController::class, 'index'])->name('em.packages.index');
             Route::get('/schedules/packages/create', [PackageController::class, 'create'])->name('em.packages.create');
