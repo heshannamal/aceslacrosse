@@ -24,6 +24,7 @@
             @yield('content')
 
             @if(request()->routeIs('admin.parents.booking.index'))
+                @include('admin.parents_booking._credit_log')
                 @include('admin.parents_booking._credits_wizard')
             @endif
 
