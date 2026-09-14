@@ -87,7 +87,7 @@ class TrainingProfileController extends Controller
             ]);
         });
 
-        return back()->with('success', 'Player added to the shared family account.');
+        return back()->with('success', 'Player added to your Training account.');
     }
 
     public function updateChild(Request $request, EMCustomerChild $child, TrainingFamilyService $families)
@@ -115,7 +115,7 @@ class TrainingProfileController extends Controller
             ->exists();
 
         if ($hasUpcoming) {
-            return back()->with('error', 'This player has an active family booking and cannot be removed yet.');
+            return back()->with('error', 'This player has an active Training booking and cannot be removed yet.');
         }
 
         $child->is_active = 0;
@@ -147,11 +147,11 @@ class TrainingProfileController extends Controller
 
     private function ensureChildOwnership(EMCustomer $customer, EMCustomerChild $child, TrainingFamilyService $families): void
     {
-        $familyIds = $families->memberIds($customer);
+        $parentIds = $families->memberIds($customer);
         abort_unless(
-            EMCustomerChildParent::whereIn('customer_id', $familyIds)->where('child_id', $child->id)->exists(),
+            EMCustomerChildParent::whereIn('customer_id', $parentIds)->where('child_id', $child->id)->exists(),
             403,
-            'This player is not linked to your family Training account.'
+            'This player is not linked to your Training account.'
         );
     }
 
