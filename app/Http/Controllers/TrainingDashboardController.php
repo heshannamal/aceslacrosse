@@ -6,16 +6,12 @@ use App\Models\EMCustomer;
 use App\Models\EMCustomerCredit;
 use App\Models\EMCustomerPackageCart;
 use App\Models\EMSessionBooking;
+use App\Services\Training\TrainingFamilyService;
 use Carbon\Carbon;
 
 class TrainingDashboardController extends Controller
 {
     private const TIMEZONE = 'America/Los_Angeles';
-
-    /**
-     * Only confirmed/real bookings belong in the customer booking history.
-     * pending_payment records are temporary checkout/cart reservations.
-     */
     private const CUSTOMER_BOOKING_STATUSES = ['booked', 'paid', 'completed'];
 
     public function index()
@@ -35,24 +31,21 @@ class TrainingDashboardController extends Controller
             ->where('active', 1)
             ->firstOrFail();
 
+        $family = app(TrainingFamilyService::class);
+        $familyIds = $family->memberIds($customer);
+
         $credits = EMCustomerCredit::query()
-            ->where('customer_id', $customer->id)
+            ->whereIn('customer_id', $familyIds)
             ->orderByDesc('id')
             ->get();
 
         $remainingCredits = (int) $credits->sum(fn ($credit) => max(0, (int) ($credit->remaining_classes ?? 0)));
         $usedCredits = (int) $credits->sum(fn ($credit) => max(0, (int) ($credit->used_classes ?? 0)));
 
-        $children = $customer->activeChildren()
-            ->orderBy('em_customer_children.first_name')
-            ->orderBy('em_customer_children.last_name')
-            ->get();
+        $children = $family->children($customer);
 
-        // pending_payment is intentionally excluded here. A pending-payment
-        // booking is only a temporary reservation linked to the Training cart
-        // until checkout succeeds.
-        $bookings = EMSessionBooking::with(['child', 'sessionEvent', 'package'])
-            ->where('customer_id', $customer->id)
+        $bookings = EMSessionBooking::with(['customer', 'child', 'sessionEvent', 'package'])
+            ->whereIn('customer_id', $familyIds)
             ->whereIn('status', self::CUSTOMER_BOOKING_STATUSES)
             ->orderByDesc('booked_at')
             ->orderByDesc('id')
@@ -79,7 +72,7 @@ class TrainingDashboardController extends Controller
         $bookingsCount = $bookings->count();
 
         $trainingCartCount = (int) EMCustomerPackageCart::query()
-            ->where('customer_id', $customer->id)
+            ->whereIn('customer_id', $familyIds)
             ->sum('quantity');
 
         return compact(
