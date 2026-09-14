@@ -3,17 +3,22 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\EMAdminCreditAdditionLog;
 use App\Models\EMCustomer;
 use App\Models\EMCustomerChild;
 use App\Models\EMCustomerChildParent;
 use App\Models\EMCustomerCredit;
 use App\Models\EMCustomerCreditLog;
 use App\Services\Training\TrainingFamilyService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class ChildCreditController extends Controller
 {
+    private const TIMEZONE = 'America/Los_Angeles';
+
     public function options(TrainingFamilyService $families)
     {
         $children = EMCustomerChild::with(['parentRelations.customer'])
@@ -59,8 +64,73 @@ class ChildCreditController extends Controller
         ]);
     }
 
+    public function logs(Request $request)
+    {
+        if (!Schema::hasTable('em_admin_credit_addition_logs')) {
+            return response()->json([
+                'status' => true,
+                'logs' => [],
+                'pagination' => [
+                    'current_page' => 1,
+                    'last_page' => 1,
+                    'per_page' => 10,
+                    'total' => 0,
+                    'from' => 0,
+                    'to' => 0,
+                ],
+                'migration_required' => true,
+            ]);
+        }
+
+        $perPage = min(50, max(5, (int) $request->integer('per_page', 10)));
+
+        $paginator = EMAdminCreditAdditionLog::with(['adminUser', 'child', 'customer'])
+            ->latest('id')
+            ->paginate($perPage);
+
+        $logs = collect($paginator->items())->map(function (EMAdminCreditAdditionLog $log) {
+            $adminName = trim((string) optional($log->adminUser)->name);
+
+            return [
+                'id' => (int) $log->id,
+                'created_at' => $log->created_at
+                    ? Carbon::parse($log->created_at)->timezone(self::TIMEZONE)->format('M d, Y g:i A')
+                    : '—',
+                'child' => $log->child ? $log->child->full_name : 'Deleted child',
+                'parent' => $log->customer ? $log->customer->display_name : 'Deleted parent',
+                'parent_email' => optional($log->customer)->email,
+                'credits' => (int) $log->credit_amount,
+                'option' => $log->credit_option,
+                'balance_before' => (int) $log->balance_before,
+                'balance_after' => (int) $log->balance_after,
+                'admin' => $adminName !== '' ? $adminName : 'Admin #' . ($log->admin_user_id ?: '—'),
+                'note' => $log->note,
+            ];
+        })->values();
+
+        return response()->json([
+            'status' => true,
+            'logs' => $logs,
+            'pagination' => [
+                'current_page' => $paginator->currentPage(),
+                'last_page' => $paginator->lastPage(),
+                'per_page' => $paginator->perPage(),
+                'total' => $paginator->total(),
+                'from' => $paginator->firstItem() ?: 0,
+                'to' => $paginator->lastItem() ?: 0,
+            ],
+        ]);
+    }
+
     public function store(Request $request, TrainingFamilyService $families)
     {
+        if (!Schema::hasTable('em_admin_credit_addition_logs')) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Credit Addition Log is not ready yet. Please run php artisan migrate first.',
+            ], 500);
+        }
+
         $data = $request->validate([
             'child_id' => ['required', 'integer', 'exists:em_customer_children,id'],
             'customer_id' => ['required', 'integer', 'exists:em_customers,id'],
@@ -101,9 +171,19 @@ class ChildCreditController extends Controller
 
         $familyIds = $families->memberIds($parent);
         $balanceBefore = $this->familyBalance($familyIds);
+        $balanceAfter = $balanceBefore + $amount;
         $note = trim((string) ($data['note'] ?? ''));
 
-        $credit = DB::transaction(function () use ($request, $parent, $child, $amount, $note) {
+        $result = DB::transaction(function () use (
+            $request,
+            $parent,
+            $child,
+            $amount,
+            $data,
+            $note,
+            $balanceBefore,
+            $balanceAfter
+        ) {
             $credit = EMCustomerCredit::create([
                 'customer_id' => $parent->id,
                 'package_id' => null,
@@ -117,8 +197,8 @@ class ChildCreditController extends Controller
             ]);
 
             $adminName = optional($request->user())->name ?: 'Admin';
-            $message = $adminName . ' added ' . $amount . ' shared family credit' . ($amount === 1 ? '' : 's') .
-                ' for ' . $child->full_name . ' through ' . $parent->display_name . '. Credits do not expire and remain valid until used.';
+            $message = $adminName . ' added ' . $amount . ' Training credit' . ($amount === 1 ? '' : 's') .
+                ' for ' . $child->full_name . ' through ' . $parent->display_name . '. Credits remain valid until used.';
 
             if ($note !== '') {
                 $message .= ' Internal note: ' . $note;
@@ -131,18 +211,33 @@ class ChildCreditController extends Controller
                 'type' => 'credit',
                 'classes' => $amount,
                 'note' => $message,
-                'description' => 'Admin-added ACES shared family Training credits.',
+                'description' => 'Admin-added ACES Training credits.',
             ]);
 
-            return $credit;
+            $additionLog = EMAdminCreditAdditionLog::create([
+                'admin_user_id' => optional($request->user())->id,
+                'child_id' => $child->id,
+                'customer_id' => $parent->id,
+                'credit_id' => $credit->id,
+                'credit_amount' => $amount,
+                'credit_option' => $data['credit_option'],
+                'balance_before' => $balanceBefore,
+                'balance_after' => $balanceAfter,
+                'note' => $note !== '' ? $note : null,
+                'ip_address' => $request->ip(),
+                'user_agent' => substr((string) $request->userAgent(), 0, 500),
+            ]);
+
+            return compact('credit', 'additionLog');
         });
 
         return response()->json([
             'status' => true,
-            'message' => $amount . ' shared family credit' . ($amount === 1 ? '' : 's') . ' added successfully.',
-            'credit_id' => (int) $credit->id,
+            'message' => $amount . ' credit' . ($amount === 1 ? '' : 's') . ' added successfully.',
+            'credit_id' => (int) $result['credit']->id,
+            'log_id' => (int) $result['additionLog']->id,
             'family_balance_before' => $balanceBefore,
-            'family_balance_after' => $balanceBefore + $amount,
+            'family_balance_after' => $balanceAfter,
             'validity' => 'No Expiration — Until Used',
         ]);
     }
