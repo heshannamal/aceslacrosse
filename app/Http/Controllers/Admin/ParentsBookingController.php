@@ -8,7 +8,6 @@ use App\Models\EMCustomerChild;
 use App\Models\EMCustomerChildParent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use ZipArchive;
@@ -99,7 +98,7 @@ class ParentsBookingController extends Controller
     private function saveAdminParent(array $data,string $prefix,int $type,?int $relationalId):?EMCustomer
     {
         $id=!empty($data[$prefix.'_id'])?(int)$data[$prefix.'_id']:null;$email=strtolower(trim((string)($data[$prefix.'_email']??'')));$first=trim((string)($data[$prefix.'_first_name']??''));$last=trim((string)($data[$prefix.'_last_name']??''));$phone=trim((string)($data[$prefix.'_phone']??''));if(!$id&&!$email&&!$first&&!$last&&!$phone)return null;
-        $parent=$id?EMCustomer::find($id):null;if(!$parent&&$email)$parent=EMCustomer::whereRaw('LOWER(email)=?',[$email])->first();if(!$parent){if(!$email)return null;$parent=new EMCustomer(['password'=>Hash::make(Str::random(20)),'active'=>1]);}
+        $parent=$id?EMCustomer::find($id):null;if(!$parent&&$email)$parent=EMCustomer::whereRaw('LOWER(email)=?',[$email])->first();if(!$parent){if(!$email)return null;$parent=new EMCustomer(['password'=>null,'active'=>1]);}
         $parent->first_name=$first?:$parent->first_name;$parent->last_name=$last?:$parent->last_name;if($email)$parent->email=$email;if($phone!=='')$parent->phone=$phone;if(Schema::hasColumn('em_customers','parent_type'))$parent->parent_type=$type;if(Schema::hasColumn('em_customers','relational_id'))$parent->relational_id=$relationalId;if(Schema::hasColumn('em_customers','active'))$parent->active=1;$parent->save();return $parent;
     }
     private function attachParent(EMCustomerChild $child,?EMCustomer $parent,bool $primary):void{if(!$parent)return;EMCustomerChildParent::updateOrCreate(['customer_id'=>$parent->id,'child_id'=>$child->id],['relationship'=>$primary?'Parent 1':'Parent 2','is_primary'=>$primary?1:0,'can_book'=>1,'can_pay'=>1,'can_pickup'=>0,'notes'=>null]);}
