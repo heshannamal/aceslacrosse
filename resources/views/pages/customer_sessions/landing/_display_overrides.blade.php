@@ -29,7 +29,27 @@
         ];
     })->values();
 
-    $acesCalendarDisplaySessions = collect($calendarSessions ?? $sessions ?? [])->map(function ($session) {
+    $acesFamilySessionStatuses = collect();
+    try {
+        if (!empty($customer)) {
+            $familyIds = app(\App\Services\Training\TrainingFamilyService::class)->memberIds($customer);
+            $acesFamilySessionStatuses = \App\Models\EMSessionBooking::query()
+                ->whereIn('customer_id', $familyIds)
+                ->whereIn('status', ['pending_payment', 'booked', 'paid', 'completed'])
+                ->get(['session_event_id', 'status'])
+                ->groupBy('session_event_id')
+                ->map(function ($rows) {
+                    if ($rows->whereIn('status', ['booked', 'paid', 'completed'])->isNotEmpty()) {
+                        return 'booked';
+                    }
+                    return $rows->where('status', 'pending_payment')->isNotEmpty() ? 'pending' : null;
+                });
+        }
+    } catch (\Throwable $e) {
+        $acesFamilySessionStatuses = collect();
+    }
+
+    $acesCalendarDisplaySessions = collect($calendarSessions ?? $sessions ?? [])->map(function ($session) use ($acesFamilySessionStatuses) {
         try {
             $date = !empty($session->event_date)
                 ? \Carbon\Carbon::parse($session->event_date)->format('Y-m-d')
@@ -57,6 +77,7 @@
             'title' => $session->training_type ?: ($session->name ?: 'Training'),
             'time' => trim($start . ($end ? ' - ' . $end : '')),
             'city' => $city,
+            'family_status' => $acesFamilySessionStatuses->get((int) ($session->id ?? 0)),
         ];
     })->filter(function ($session) {
         return !empty($session['date']);
@@ -99,6 +120,16 @@
         font-size: 9px;
         flex: 0 0 auto;
     }
+    .training-calendar-event a.aces-family-booked {
+        background:#eefbf3 !important;
+        color:#167044 !important;
+        border-color:#b9e3c8 !important;
+    }
+    .training-calendar-event a.aces-family-pending {
+        background:#f4edfc !important;
+        color:#611eb2 !important;
+        border-color:#d3b8ed !important;
+    }
 </style>
 
 @if($acesLocationDisplaySessions->isNotEmpty() || $acesCalendarDisplaySessions->isNotEmpty())
@@ -106,6 +137,8 @@
 document.addEventListener('DOMContentLoaded', function () {
     var sessions = @json($acesLocationDisplaySessions);
     var calendarSessions = @json($acesCalendarDisplaySessions);
+    var bookingsUrl = @json(route('em.customer.bookings'));
+    var cartUrl = @json(route('em.customer.cart'));
     var cards = Array.prototype.slice.call(document.querySelectorAll('.training-session-grid > .training-session-card'));
 
     function setLocationInDetails(modal, value) {
@@ -173,7 +206,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
     }
 
-    function patchCalendarCities() {
+    function patchCalendar() {
         if (!grid || !monthLabel) return;
 
         var labelParts = (monthLabel.textContent || '').trim().split(/\s+/);
@@ -197,8 +230,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
             var eventNodes = Array.prototype.slice.call(cell.querySelectorAll('.training-calendar-event'));
             eventNodes.forEach(function (eventNode, eventIndex) {
-                if (eventNode.querySelector('.training-calendar-city')) return;
-
                 var titleNode = eventNode.querySelector('strong');
                 var timeNode = eventNode.querySelector(':scope > span:not(.training-calendar-city)');
                 var title = titleNode ? titleNode.textContent.trim() : '';
@@ -208,28 +239,42 @@ document.addEventListener('DOMContentLoaded', function () {
                     return session.title === title && session.time === time;
                 }) || eventsForDay[eventIndex];
 
-                if (!match || !match.city) return;
+                if (!match) return;
 
-                var cityRow = document.createElement('span');
-                cityRow.className = 'training-calendar-city';
-                cityRow.innerHTML = '<i class="fa-solid fa-location-dot" aria-hidden="true"></i><span></span>';
-                cityRow.querySelector('span').textContent = match.city;
+                if (!eventNode.querySelector('.training-calendar-city') && match.city) {
+                    var cityRow = document.createElement('span');
+                    cityRow.className = 'training-calendar-city';
+                    cityRow.innerHTML = '<i class="fa-solid fa-location-dot" aria-hidden="true"></i><span></span>';
+                    cityRow.querySelector('span').textContent = match.city;
+                    var currentAction = eventNode.querySelector('a');
+                    if (currentAction) eventNode.insertBefore(cityRow, currentAction);
+                    else eventNode.appendChild(cityRow);
+                }
 
                 var action = eventNode.querySelector('a');
-                if (action) {
-                    eventNode.insertBefore(cityRow, action);
-                } else {
-                    eventNode.appendChild(cityRow);
+                if (!action || !match.family_status) return;
+
+                action.removeAttribute('data-calendar-book');
+                action.classList.remove('aces-family-booked', 'aces-family-pending');
+
+                if (match.family_status === 'booked') {
+                    action.textContent = 'BOOKED';
+                    action.href = bookingsUrl;
+                    action.classList.add('aces-family-booked');
+                } else if (match.family_status === 'pending') {
+                    action.textContent = 'IN FAMILY CART';
+                    action.href = cartUrl;
+                    action.classList.add('aces-family-pending');
                 }
             });
         });
     }
 
-    patchCalendarCities();
+    patchCalendar();
 
     if (grid) {
         var calendarObserver = new MutationObserver(function () {
-            patchCalendarCities();
+            patchCalendar();
         });
         calendarObserver.observe(grid, { childList: true, subtree: true });
     }
