@@ -46,10 +46,43 @@
     <!-- Back to Top Button -->
     <a href="#" class="back-to-top">
         <i class="bi bi-chevron-up" style="font-size: 15px;"></i>
-
     </a>
 </footer>
 
-@if(request()->routeIs('em.customer.index'))
-    @include('pages.customer_sessions.landing._display_overrides')
+@if(session()->has('em_customer_id'))
+    @php
+        $sharedFamilyCartCount = 0;
+        try {
+            $sharedFamilyCustomer = \App\Models\EMCustomer::query()
+                ->whereKey((int) session('em_customer_id'))
+                ->where('active', 1)
+                ->first();
+            if ($sharedFamilyCustomer) {
+                $sharedFamilyIds = app(\App\Services\Training\TrainingFamilyService::class)->memberIds($sharedFamilyCustomer);
+                $sharedFamilyCartCount = (int) \App\Models\EMCustomerPackageCart::query()
+                    ->whereIn('customer_id', $sharedFamilyIds)
+                    ->sum('quantity');
+            }
+        } catch (\Throwable $e) {
+            $sharedFamilyCartCount = 0;
+        }
+    @endphp
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var count = {{ $sharedFamilyCartCount }};
+        document.querySelectorAll('a[aria-label="Training cart"]').forEach(function (cartLink) {
+            var badge = cartLink.querySelector('.header-cart-badge');
+            if (count > 0) {
+                if (!badge) {
+                    badge = document.createElement('span');
+                    badge.className = 'header-cart-badge';
+                    cartLink.appendChild(badge);
+                }
+                badge.textContent = count > 99 ? '99+' : String(count);
+            } else if (badge) {
+                badge.remove();
+            }
+        });
+    });
+    </script>
 @endif
