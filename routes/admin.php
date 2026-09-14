@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\BookingController;
+use App\Http\Controllers\Admin\ChildCreditController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\PackageController;
 use App\Http\Controllers\Admin\ParentsBookingController;
@@ -32,6 +33,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('/parents-booking/upload', [ParentsBookingController::class, 'upload'])->name('parents.booking.upload');
             Route::post('/parents-booking/import', [ParentsBookingController::class, 'import'])->name('parents.booking.import');
             Route::get('/parents-booking/parents/check-email', [ParentsBookingController::class, 'checkParentEmail'])->name('parents.booking.parents.check-email');
+            Route::get('/parents-booking/credits/options', [ChildCreditController::class, 'options'])->name('parents.booking.credits.options');
+            Route::post('/parents-booking/credits', [ChildCreditController::class, 'store'])->name('parents.booking.credits.store');
             Route::post('/parents-booking/children', [ParentsBookingController::class, 'storeChild'])->name('parents.booking.children.store');
             Route::put('/parents-booking/children/{child}', [ParentsBookingController::class, 'updateChild'])->name('parents.booking.children.update');
             Route::delete('/parents-booking/children/{child}', [ParentsBookingController::class, 'deleteChild'])->name('parents.booking.children.delete');
