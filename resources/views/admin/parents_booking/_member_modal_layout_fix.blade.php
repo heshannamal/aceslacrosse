@@ -4,6 +4,13 @@
  * Use an explicit header/body/footer grid so action buttons can never be
  * pushed outside the viewport by the long member form.
  */
+.member-modal,
+#importModal {
+    --accent: #611eb2;
+    --accent-dark: #4d168f;
+    --soft: #f4edfc;
+}
+
 body .member-modal .modal-dialog {
     display: flex !important;
     width: calc(100% - 32px) !important;
@@ -78,6 +85,25 @@ body .member-modal .modal-footer .btn {
     margin: 0 !important;
     visibility: visible !important;
     opacity: 1 !important;
+}
+
+body .member-modal .modal-footer .accent-btn,
+#importModal .modal-footer .accent-btn {
+    background: #611eb2 !important;
+    border: 1px solid #611eb2 !important;
+    color: #fff !important;
+    font-weight: 800 !important;
+    border-radius: 999px !important;
+    box-shadow: 0 8px 20px rgba(97, 30, 178, .18) !important;
+}
+
+body .member-modal .modal-footer .accent-btn:hover,
+body .member-modal .modal-footer .accent-btn:focus,
+#importModal .modal-footer .accent-btn:hover,
+#importModal .modal-footer .accent-btn:focus {
+    background: #4d168f !important;
+    border-color: #4d168f !important;
+    color: #fff !important;
 }
 
 /* Import Members is shorter, but give it the same guaranteed footer behavior. */
