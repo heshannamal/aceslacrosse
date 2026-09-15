@@ -40,6 +40,7 @@
             @endif
 
             @include('admin._training_ui_overrides')
+            @include('admin._modal_layout_fix')
         </main>
     </div>
 </div>
