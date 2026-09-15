@@ -10,4 +10,4 @@
         @endforeach
     </div>
 </div>
-<div class="modal-footer"><button type="button" class="btn btn-outline-secondary rounded-pill" data-bs-dismiss="modal">Close</button><button class="btn accent-btn px-4"><i class="fa-solid fa-check me-2"></i>Save Member</button></div>
+<div class="modal-footer"><button type="button" class="btn btn-outline-secondary rounded-pill" data-bs-dismiss="modal">Close</button><button type="submit" class="btn accent-btn px-4"><i class="fa-solid fa-check me-2"></i>Save Member</button></div>
