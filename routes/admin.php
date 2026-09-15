@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AcesBookingController;
+use App\Http\Controllers\Admin\AcesParentsBookingController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\ChildCreditController;
@@ -36,8 +37,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('/parents-booking/credits/options', [ChildCreditController::class, 'options'])->name('parents.booking.credits.options');
             Route::get('/parents-booking/credits/logs', [ChildCreditController::class, 'logs'])->name('parents.booking.credits.logs');
             Route::post('/parents-booking/credits', [ChildCreditController::class, 'store'])->name('parents.booking.credits.store');
-            Route::post('/parents-booking/children', [ParentsBookingController::class, 'storeChild'])->name('parents.booking.children.store');
-            Route::put('/parents-booking/children/{child}', [ParentsBookingController::class, 'updateChild'])->name('parents.booking.children.update');
+            Route::post('/parents-booking/children', [AcesParentsBookingController::class, 'storeChild'])->name('parents.booking.children.store');
+            Route::put('/parents-booking/children/{child}', [AcesParentsBookingController::class, 'updateChild'])->name('parents.booking.children.update');
             Route::delete('/parents-booking/children/{child}', [ParentsBookingController::class, 'deleteChild'])->name('parents.booking.children.delete');
             Route::get('/bookings/session-wise', [AcesBookingController::class, 'index'])->name('bookings.session-wise');
             Route::post('/bookings/session-wise/manual/validate', [AcesBookingController::class, 'validateManual'])->name('bookings.session-wise.manual.validate');
