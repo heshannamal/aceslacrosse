@@ -41,6 +41,9 @@
 
             @include('admin._training_ui_overrides')
             @include('admin._modal_layout_fix')
+            @if(request()->routeIs('admin.bookings.session-wise'))
+                @include('admin.bookings._aces_theme_fix')
+            @endif
             @if(request()->routeIs('admin.parents.booking.index'))
                 @include('admin.parents_booking._member_modal_layout_fix')
             @endif
