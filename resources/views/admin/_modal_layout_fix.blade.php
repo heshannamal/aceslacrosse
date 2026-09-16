@@ -82,17 +82,26 @@
         box-shadow: 0 -8px 20px rgba(23, 16, 33, .035);
     }
 
-    .modal .modal-footer .btn,
-    .modal .modal-footer button,
-    .modal .ao-booking-modal-footer button,
-    .modal .ao-manual-footer button,
-    .modal .wizard-footer button {
+    /* Never override Bootstrap's .d-none on wizard actions. */
+    .modal .modal-footer .btn:not(.d-none),
+    .modal .modal-footer button:not(.d-none),
+    .modal .ao-booking-modal-footer button:not(.d-none),
+    .modal .ao-manual-footer button:not(.d-none),
+    .modal .wizard-footer button:not(.d-none) {
         display: inline-flex !important;
         align-items: center !important;
         justify-content: center !important;
         min-height: 42px;
         line-height: 1.15;
         white-space: nowrap;
+    }
+
+    .modal .modal-footer button.d-none,
+    .modal .modal-footer .btn.d-none,
+    .modal .ao-booking-modal-footer button.d-none,
+    .modal .ao-manual-footer button.d-none,
+    .modal .wizard-footer button.d-none {
+        display: none !important;
     }
 
     /* Add/Edit Member is the modal that exposed the issue first. Its local
