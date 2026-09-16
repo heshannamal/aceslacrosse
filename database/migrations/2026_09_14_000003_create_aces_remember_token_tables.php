@@ -16,8 +16,8 @@ return new class extends Migration
                 $table->string('validator_hash', 64);
                 $table->string('user_agent', 500)->nullable();
                 $table->string('ip_address', 45)->nullable();
-                $table->timestamp('last_used_at')->nullable();
-                $table->timestamp('expires_at');
+                $table->dateTime('last_used_at')->nullable();
+                $table->dateTime('expires_at');
                 $table->timestamps();
 
                 $table->index(['customer_id', 'expires_at'], 'aces_customer_remember_customer_expiry_idx');
@@ -34,8 +34,8 @@ return new class extends Migration
                 $table->string('validator_hash', 64);
                 $table->string('user_agent', 500)->nullable();
                 $table->string('ip_address', 45)->nullable();
-                $table->timestamp('last_used_at')->nullable();
-                $table->timestamp('expires_at');
+                $table->dateTime('last_used_at')->nullable();
+                $table->dateTime('expires_at');
                 $table->timestamps();
 
                 $table->index(['user_id', 'expires_at'], 'aces_admin_remember_user_expiry_idx');
